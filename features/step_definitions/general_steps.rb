@@ -25,3 +25,24 @@ end
 Then(/^I am on the contact details page$/) do
   expect(@front_app.licences_page.current_url).to include "/contact"
 end
+
+When(/^I check the licence terms$/) do
+  @front_app.licence_details_page.licence_terms.click
+end
+
+Then(/^I am on the licence terms page$/) do
+  expect(@front_app.licences_page.current_url).to include "/terms"
+end
+
+When(/^I individually select each licence$/) do
+  @front_app.licence_terms_page.source.click
+  @front_app.licence_terms_page.point.click
+  @front_app.licence_terms_page.purpose.click
+  @front_app.licence_terms_page.means_of_abstraction.click
+  @front_app.licence_terms_page.means_of_measurement.click
+  @front_app.licence_terms_page.max_quantities.click
+end
+
+Then(/^I can see all my licence term details$/) do
+  expect(@front_app.licence_terms_page).to have_text("Close all")
+end

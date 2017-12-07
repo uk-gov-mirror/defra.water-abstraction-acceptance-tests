@@ -23,5 +23,9 @@ class FrontOfficeApp
     @last_page = LicenceDetailsPage.new
   end
 
+  def licence_terms_page
+    @last_page = LicenceTermsPage.new
+  end
+
 end
 # rubocop:enable Metrics/ClassLength
