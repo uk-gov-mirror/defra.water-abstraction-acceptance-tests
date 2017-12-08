@@ -1,13 +1,3 @@
-Given(/^I sign in with valid login details$/) do
-  @front_app = FrontOfficeApp.new
-  @front_app.start_page.load
-  @front_app.start_page.submit
-  @front_app.sign_in_page.submit(
-    email: Quke::Quke.config.custom["accounts"]["water_user"]["username"],
-    password: Quke::Quke.config.custom["accounts"]["water_user"]["password"]
-  )
-end
-
 When(/^I select "([^"]*)"$/) do |lic_no|
   @front_app.licences_page.submit(licence: lic_no)
   # Stores licence number for later checks
