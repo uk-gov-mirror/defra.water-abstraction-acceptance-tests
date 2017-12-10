@@ -1,11 +1,15 @@
 class SignInPage < SitePrism::Page
 
-  # Sign in page
-
   element(:email, "#user-id")
   element(:password, "#password")
   element(:disabled_submit_button, "input[aria-disabled='true']")
   element(:submit_button, "input[type='submit']")
+
+  def submit(args = {})
+    email.set(args[:email]) if args.key?(:email)
+    password.set(args[:password]) if args.key?(:password)
+    submit_button.click
+  end
 
   def submit_incorrect_password(args = {})
     refresh_cnt = 0
@@ -19,16 +23,9 @@ class SignInPage < SitePrism::Page
       else
         refresh_cnt += 1
         sleep(1)
-
       end
       break unless refresh_cnt < 20
     end
-  end
-
-  def submit(args = {})
-    email.set(args[:email]) if args.key?(:email)
-    password.set(args[:password]) if args.key?(:password)
-    submit_button.click
   end
 
 end

@@ -28,4 +28,3 @@ class FrontOfficeApp
   end
 
 end
-# rubocop:enable Metrics/ClassLength

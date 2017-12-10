@@ -5,9 +5,9 @@ class LicencesPage < SitePrism::Page
   elements(:licences, ".licence-title")
 
   def submit(args = {})
-    if args.key?(:licence)
-      licences.find { |btn| btn.text == args[:licence] }.click
-    end
+    return unless args.key?(:licence)
+
+    licences.find { |btn| btn.text == args[:licence] }.click
   end
 
 end
