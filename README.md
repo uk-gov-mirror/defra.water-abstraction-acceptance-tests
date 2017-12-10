@@ -4,7 +4,6 @@
 [![security](https://hakiri.io/github/DEFRA/water-abstraction-acceptance-tests/master.svg)](https://hakiri.io/github/DEFRA/water-abstraction-acceptance-tests/master)
 [![Dependency Status](https://dependencyci.com/github/DEFRA/water-abstraction-acceptance-tests/badge)](https://dependencyci.com/github/DEFRA/water-abstraction-acceptance-tests)
 
-
 This project contains the acceptance tests for the Water abstraction digital service. It is built around [Quke](https://github.com/DEFRA/quke), a Ruby gem that simplifies the process of writing and running Cucumber acceptance tests.
 
 ## Pre-requisites
@@ -41,7 +40,7 @@ Into that file you'll need to add as a minimum this
 # Capybara will attempt to find an element for a period of time, rather than
 # immediately failing because the element cannot be found. This defaults to 2
 # seconds but with the need to confirm emails via mailinator, we have found we
-# need to increase this time to at least 5 seconds 
+# need to increase this time to at least 5 seconds
 max_wait_time: 5
 
 custom:
