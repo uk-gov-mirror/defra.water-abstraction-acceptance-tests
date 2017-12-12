@@ -1,10 +1,11 @@
-Given(/^I sign in with valid login details$/) do
+
+Given(/^I sign into my account$/) do
   @front_app = FrontOfficeApp.new
   @front_app.start_page.load
   @front_app.start_page.submit
   @front_app.sign_in_page.submit(
-    email: Quke::Quke.config.custom["accounts"]["water_user"]["username"],
-    password: Quke::Quke.config.custom["accounts"]["water_user"]["password"]
+    email: Quke::Quke.config.custom["accounts"]["water_user1"]["username"],
+    password: Quke::Quke.config.custom["accounts"]["water_user1"]["password"]
   )
 end
 
@@ -16,40 +17,45 @@ end
 
 When(/^I enter my password incorrectly$/) do
   @front_app.sign_in_page.submit(
-    email: Quke::Quke.config.custom["accounts"]["water_user"]["username"],
+    email: Quke::Quke.config.custom["accounts"]["water_user2"]["username"],
     password: "@3kjldjfa@"
-  )
-end
-
-When(/^I sign in with the correct credentials$/) do
-  @front_app.sign_in_page.submit(
-    email: Quke::Quke.config.custom["accounts"]["water_user"]["username"],
-    password: Quke::Quke.config.custom["accounts"]["water_user"]["password"]
   )
 end
 
 Then(/^I am informed "([^"]*)"$/) do |message|
   expect(@front_app.sign_in_page).to have_text(message)
 end
-
-# rubocop:disable Metrics/LineLength
 Given(/^I lock my account by attempting to sign in with an incorrect password too many times$/) do
   @front_app = FrontOfficeApp.new
   @front_app.start_page.load
   @front_app.start_page.submit
-  # Ten is the magic number..
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
-  @front_app.sign_in_page.submit_incorrect_password(email: Quke::Quke.config.custom["accounts"]["water_user"]["username"])
+  # Locks account after ten unsuccessful attempts
+  @front_app.sign_in_page.lock_account(email: Quke::Quke.config.custom["accounts"]["water_user2"]["username"])
 end
 # rubocop:enable Metrics/LineLength
-When(/^I receive an email informing me my account is locked$/) do
-  pending # Needs a mailinator account before finishing this scenario
+When(/^I unlock my account using the email link provided$/) do
+  @front_app.mailinator_home_page.load
+  @front_app.mailinator_home_page.submit(inbox: Quke::Quke.config.custom["accounts"]["water_user2"]["username"])
+  @front_app.mailinator_inbox_page.email[0].from.click
+
+  @front_app.mailinator_inbox_page.email_details do |frame|
+    @new_window = window_opened_by { frame.reset_password.click }
+  end
+
+  within_window @new_window do
+    @front_app.reset_password_page.submit(
+      password: Quke::Quke.config.custom["accounts"]["water_user2"]["password"],
+      confirm_password: Quke::Quke.config.custom["accounts"]["water_user2"]["password"]
+    )
+    @front_app.sign_in_page.submit(
+      email: Quke::Quke.config.custom["accounts"]["water_user2"]["username"],
+      password: Quke::Quke.config.custom["accounts"]["water_user2"]["password"]
+    )
+  end
+end
+
+Then(/^I can sign into my account$/) do
+  within_window @new_window do
+    expect(@front_app.licences_page.current_url).to include "/licences"
+  end
 end

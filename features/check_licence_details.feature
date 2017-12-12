@@ -5,7 +5,7 @@ Feature: Check licence details
   So that I know how much water I am licenced to abstract legally
 
   Background:
-    Given I sign in with valid login details
+    Given I sign into my account
     And I select "Licence number: 18/54/13/0381"
 
   Scenario: Contact details are shown for licence
