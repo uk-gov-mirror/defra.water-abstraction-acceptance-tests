@@ -1,12 +1,12 @@
-@readonly
-Feature: Check licence details
+@basic @readonly
+Feature: Basic licence checks
   As a business with a water abstraction licence
   I want to be able to check my licence details
   So that I know how much water I am licenced to abstract legally
 
   Background:
     Given I sign into my account as "water_user1"
-    And I select "18/54/13/0381"
+    And I access the first licence
 
   Scenario: Contact details are shown for licence
     When I check the licence contact details
