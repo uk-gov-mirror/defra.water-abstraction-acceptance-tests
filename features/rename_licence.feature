@@ -6,7 +6,7 @@ Feature: Rename licence
 
   Background:
     Given I sign into my account as "water_user1"
-    And I select "18/54/13/0381"
+    And I select a particular licence
     When I select the "Name this licence" link
 
   Scenario: Cancel licence rename

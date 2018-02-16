@@ -23,8 +23,16 @@ class FrontOfficeApp
     @last_page = LicenceDetailsPage.new
   end
 
-  def licence_terms_page
-    @last_page = LicenceTermsPage.new
+  def licence_points_page
+    @last_page = LicencePointsPage.new
+  end
+
+  def licence_purposes_page
+    @last_page = LicencePurposesPage.new
+  end
+
+  def licence_conditions_page
+    @last_page = LicenceConditionsPage.new
   end
 
   def mailinator_home_page
@@ -57,6 +65,38 @@ class FrontOfficeApp
 
   def mailinator_inbox_page
     @last_page = MailinatorInboxPage.new
+  end
+
+  def register_email_page
+    @last_page = RegisterEmailPage.new
+  end
+
+  def register_create_pw_page
+    @last_page = RegisterCreatePasswordPage.new
+  end
+
+  def register_add_licences_page
+    @last_page = RegisterAddLicencesPage.new
+  end
+
+  def register_confirm_licences_page
+    @last_page = RegisterConfirmLicencesPage.new
+  end
+
+  def register_not_my_licences_page
+    @last_page = RegisterNotMyLicencesPage.new
+  end
+
+  def register_choose_address_page
+    @last_page = RegisterChooseAddressPage.new
+  end
+
+  def register_sending_letter_page
+    @last_page = RegisterSendingLetterPage.new
+  end
+
+  def register_security_code_page
+    @last_page = RegisterSecurityCodePage.new
   end
 
 end
