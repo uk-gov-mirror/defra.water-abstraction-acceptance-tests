@@ -1,7 +1,7 @@
 
 Given(/^I search for a partial licence number$/) do
   @expected_search_result = "28/09"
-  @expected_result_count = 4
+  @expected_result_count = 16
   @front_app.licences_page.search(
     search_form: @expected_search_result.to_s
   )
@@ -15,7 +15,7 @@ Given(/^all licences containing that term are shown on screen$/) do
 end
 
 Given(/^I search for a partial licence name$/) do
-  @expected_search_result = "cheese"
+  @expected_search_result = "Swynn"
   @expected_result_count = 1
   @front_app.licences_page.search(
     search_form: @expected_search_result.to_s
@@ -72,6 +72,6 @@ Given(/^I enter an email address on the licence holder's email field$/) do
   # Quke::Quke.config.custom["data"][@environment]["licence_searchterm"].to_s
   @expected_result_count = 1
   @front_app.licences_page.search(
-    email_form: @reg_email # Quke::Quke.config.custom["accounts"]["water_user_john"]["username"].to_s
+    email_form: @reg_email
   )
 end
