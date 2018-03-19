@@ -40,12 +40,12 @@ Then(/^I am on the licence points page$/) do
 end
 
 When(/^I check the licence purposes$/) do
-  @front_app.licences_page.click_link(text: "your abstraction purpose")
+  @front_app.licences_page.click_link(text: "View details of your purpose")
 end
 
 Then(/^I am on the licence purposes page$/) do
   expect(@front_app.licence_purposes_page.current_url).to include "/purposes"
-  expect(@front_app.licence_purposes_page).to have_text("Abstraction purposes for licence")
+  expect(@front_app.licence_purposes_page).to have_text("Abstraction details for licence")
 end
 
 When(/^I check the licence conditions$/) do
@@ -59,7 +59,7 @@ Then(/^I am on the licence conditions page$/) do
   expect(@front_app.licence_conditions_page.disclaimer).to have_text("You must refer to the paper copy of your licence")
 end
 
-Given(/^I select the "Name this licence" link$/) do
+Given(/^I select the link to name the licence$/) do
   @front_app.licence_details_page.click_name_or_rename
 end
 
@@ -74,13 +74,14 @@ Given(/^I enter a licence name which is invalid$/) do
 end
 
 Given(/^the expected licence name appears on the licence summary page$/) do
-  @front_app.licence_details_page.back_link.click
+  @front_app.licences_page.click_link(text: "Licences")
+  @front_app.licences_page.wait_for_search_form
   @front_app.licences_page.search(search_form: "/")
   expect(@front_app.licences_page).to have_text(@expected_licence_name.to_s)
 end
 
 Given(/^the licence name is searchable on the abstraction licences page$/) do
-  @front_app.licence_details_page.abstraction_licences_link.click
+  @front_app.licences_page.click_link(text: "Licences")
   @expected_search_result = @expected_licence_name
   @expected_result_count = 1
   @front_app.licences_page.search(

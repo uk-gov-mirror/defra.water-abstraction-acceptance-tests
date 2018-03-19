@@ -1,4 +1,4 @@
-@readonly
+@readonly @bs
 Feature: Search and filter on licences page
 
 Background:
@@ -25,6 +25,10 @@ Scenario: Remove search term
 Scenario: Sort licences by name
   When I select the licence name heading
   Then the table is sorted by licence name in ascending order
+
+Scenario: Sort licences by end date
+  When I select the end date heading
+  Then the table is sorted by end date in ascending order
 
 Scenario: Sort licences by number
   When I select the licence name heading
