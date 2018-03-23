@@ -14,6 +14,6 @@ gem "rake"
 gem "faker"
 
 # Cucumber Reports
-gem 'cucumber-report-format', '~> 0.0.3'
+gem "cucumber-report-format", "~> 0.0.3"
 
-gem 'report_builder', '~> 1.5'  
+gem "report_builder", "~> 1.5"

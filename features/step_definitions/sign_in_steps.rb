@@ -34,7 +34,7 @@ Given(/^I lock my account by attempting to sign in with an incorrect password to
   @account_to_lock = Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["username"]
   @front_app.sign_in_page.lock_account(email: @account_to_lock)
 end
-# rubocop:enable Metrics/LineLength
+
 When(/^I unlock my account using the email link provided$/) do
   @environment = Quke::Quke.config.custom["current_environment"].to_s
   @mailinator_username = Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["username"]
