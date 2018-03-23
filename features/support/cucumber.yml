@@ -1,0 +1,3 @@
+html_report: --format pretty --format html --out=results.html
+json_report: --format pretty --format json --out=results.json
+junit_report: --format junit --out junit-reports

@@ -1,5 +1,5 @@
 @readwrite
-Feature: Register and share
+Feature: [WATER - <JIRA no.>] Register and share
   As a user with a water abstraction licence
   I want to register with the service
   So that I can view my licence and share access with my agent

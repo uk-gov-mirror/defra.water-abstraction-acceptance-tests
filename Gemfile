@@ -12,3 +12,8 @@ gem "rake"
 
 # Create random names
 gem "faker"
+
+# Cucumber Reports
+gem 'cucumber-report-format', '~> 0.0.3'
+
+gem 'report_builder', '~> 1.5'  
