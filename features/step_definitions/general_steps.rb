@@ -15,6 +15,9 @@ Then(/^I am on the internal abstraction licences page$/) do
   expect(@front_app.licences_page.heading).to have_text("Licences")
   @front_app.licences_page.search(search_form: "/")
   @total_licences = @front_app.licences_page.view_links.count.to_s
+  # rubocop:disable Metrics/LineLength
+  expect(@front_app.licences_page.disclaimer).to have_text("The information included in this service does not replace or affect the legal (paper) copy of the licence issued to you. The information must be used for reference only. You must refer to and comply with the licence issued to you as a paper copy when you make decisions about abstracting or impounding water.")
+  # rubocop:enable Metrics/LineLength
 end
 
 Then(/^I am on the external abstraction licences page$/) do
@@ -74,13 +77,13 @@ Given(/^I enter a licence name which is invalid$/) do
 end
 
 Given(/^the expected licence name appears on the licence summary page$/) do
-  @front_app.licences_page.click_link(text: "Licences")
+  @front_app.licences_page.view_licences_link.click
   @front_app.licences_page.search(search_form: "/")
   expect(@front_app.licences_page).to have_text(@expected_licence_name.to_s)
 end
 
 Given(/^the licence name is searchable on the abstraction licences page$/) do
-  @front_app.licences_page.click_link(text: "Licences")
+  @front_app.licences_page.view_licences_link.click
   @expected_search_result = @expected_licence_name
   @expected_result_count = 1
   @front_app.licences_page.search(

@@ -3,8 +3,10 @@ class LicencesPage < SitePrism::Page
   # Your water abstraction licences
 
   element(:banner_links, ".header-proposition")
-  element(:manage_licences_link, "#proposition-links li+ li a")
-  element(:changepw, ".header-links a:nth-child(1)")
+  element(:view_licences_link, ".active a")
+  element(:manage_licences_link, ".active+ .navlink a")
+  element(:changepw, "#proposition-links .navlink:nth-child(1) a")
+  element(:navbar, ".navbar")
   element(:heading, ".heading-large")
   element(:content, "#content")
   elements(:licences, ".license-result__column--number a")
@@ -22,6 +24,7 @@ class LicencesPage < SitePrism::Page
   element(:lastlicence, ".license-result:last-child .heading-medium")
   element(:pagetwo, ".pagination__item:nth-child(3) .pagination__link")
   elements(:pagination_links, ".pagination__link")
+  element(:disclaimer, ".panel-border-wide p")
 
   def submit(args = {})
     return unless args.key?(:licence)
