@@ -16,23 +16,25 @@ end
 
 Given(/^I receive an email with sign in details$/) do
   @environment = Quke::Quke.config.custom["current_environment"].to_s
-  # BROKEN
-  @front_app.mailinator_home_page.load
-  @front_app.mailinator_home_page.wait_for_inbox
-  @front_app.mailinator_home_page.submit(inbox: @reg_email)
-  @front_app.mailinator_inbox_page.wait_for_email
-  @front_app.mailinator_inbox_page.email[0].from.click
+  # rubocop:disable Metrics/LineLength
+  @email_api_url = ((Quke::Quke.config.custom["urls"][@environment]["root_url"]) + "/notifications/last?email=" + @reg_email).to_s
+  # rubocop:enable Metrics/LineLength
+  visit(@email_api_url)
+  @email_json = @front_app.email_content_page.email_content.text
 
-  @front_app.mailinator_inbox_page.email_details do |frame|
-    @new_window = window_opened_by { frame.create_password.click }
-  end
+  # Finds the text in the API JSON between the following two strings:
+  # account: \r\n\r\n#
+  # \r\n\r\nIf
+  # Regex format used: Find all text between the first instance of 001 and 002
+  # @create_account_url = @email_json[/001(.*?)002/,1].to_s
+  # See https://stackoverflow.com/questions/4218986/ruby-using-regex-to-find-something-in-between-two-strings
+  @create_account_url = @email_json[/account: \\r\\n\\r\\n#(.*?)\\r\\n\\r\\nIf/, 1].to_s
+  visit(@create_account_url)
 
-  within_window @new_window do
-    @front_app.register_create_pw_page.submit(
-      password: Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["password"],
-      confirmpw: Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["password"]
-    )
-  end
+  @front_app.register_create_pw_page.submit(
+    password: Quke::Quke.config.custom["data"][@environment]["accounts"]["external_user"]["password"],
+    confirmpw: Quke::Quke.config.custom["data"][@environment]["accounts"]["external_user"]["password"]
+  )
 end
 
 Given(/^I can sign in with my new email address$/) do
@@ -41,9 +43,9 @@ Given(/^I can sign in with my new email address$/) do
   @front_app.sign_in_page.load
   @front_app.sign_in_page.submit(
     email: @reg_email.to_s,
-    password: Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["password"]
+    password: Quke::Quke.config.custom["data"][@environment]["accounts"]["external_user"]["password"]
   )
-  Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["password"]
+  Quke::Quke.config.custom["data"][@environment]["accounts"]["external_user"]["password"]
 end
 
 Then(/^I am on the add licences page$/) do
@@ -77,8 +79,8 @@ When(/^an admin user can read the code$/) do
   @environment = Quke::Quke.config.custom["current_environment"].to_s
   @front_app.sign_in_page.load
   @front_app.sign_in_page.submit(
-    email: Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user1"]["username"],
-    password: Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user1"]["password"]
+    email: Quke::Quke.config.custom["data"][@environment]["accounts"]["internal_user"]["username"],
+    password: Quke::Quke.config.custom["data"][@environment]["accounts"]["internal_user"]["password"]
   )
   @licence_reg = Quke::Quke.config.custom["data"][@environment]["licence_reg"].to_s
   @front_app.licences_page.search(
@@ -97,9 +99,9 @@ When(/^I am on the confirmation code page$/) do
   @front_app.sign_in_page.load
   @front_app.sign_in_page.submit(
     email: @reg_email.to_s,
-    password: Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["password"]
+    password: Quke::Quke.config.custom["data"][@environment]["accounts"]["external_user"]["password"]
   )
-  Quke::Quke.config.custom["data"][@environment]["accounts"]["water_user2"]["password"]
+  Quke::Quke.config.custom["data"][@environment]["accounts"]["external_user"]["password"]
   expect(@front_app.register_security_code_page.current_url).to include "/security-code"
 end
 

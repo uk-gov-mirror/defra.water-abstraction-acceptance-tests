@@ -1,5 +1,4 @@
-@readwrite @broken
-# Broken until tests are updated to read the new email API
+@readwrite
 
 Feature: [WATER-528 and 560] Register and share
   As a user with a water abstraction licence
@@ -24,7 +23,7 @@ Scenario: [WATER-528 and 560] Register and share licences
   And I can select the licence I registered
 
   Given I am on the sign in page
-  And I sign into my account as "water_user1"
+  And I sign into my account as "internal_user"
   When I enter an email address on the licence holder's email field
   Then all licences containing that term are shown on screen
 
