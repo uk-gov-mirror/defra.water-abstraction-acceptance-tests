@@ -1,11 +1,52 @@
 Given(/^I go to the notifications screen$/) do
   @front_app.licences_page.notifications_link.click
   expect(@front_app.notify_menu_page.heading).to have_text("Reports and notifications")
-  @environment = Quke::Quke.config.custom["current_environment"].to_s
-  @notify_licences = Quke::Quke.config.custom["data"][@environment]["licence_multi"].to_s
-  @notify_hof_recipient_count = Quke::Quke.config.custom["data"][@environment]["notify_hof_recipient_count"].to_s
-  @notify_exp_recipient_count = Quke::Quke.config.custom["data"][@environment]["notify_exp_recipient_count"].to_s
-  @notify_licence_count = Quke::Quke.config.custom["data"][@environment]["notify_licence_count"].to_s
+  @environment = Quke::Quke.config.custom["environment"].to_s
+  @notify_licences = Quke::Quke.config.custom["data"]["licence_some"].to_s
+  @notify_hof_recipient_count = Quke::Quke.config.custom["data"]["notify_hof_recipient_count"].to_s
+  @notify_exp_recipient_count = Quke::Quke.config.custom["data"]["notify_exp_recipient_count"].to_s
+  @notify_licence_count = Quke::Quke.config.custom["data"]["notify_licence_count"].to_s
+end
+
+Given(/^I remove my contact information$/) do
+  @front_app.notify_menu_page.contact_info_link.click
+  expect(@front_app.notify_contact_info_page.heading).to have_text("Update your contact information")
+  @front_app.notify_contact_info_page.submit(
+    contact_name: "",
+    contact_job: "",
+    contact_email: "",
+    contact_tel: "",
+    contact_address: ""
+  )
+end
+
+Given(/^I am prompted to add my contact details$/) do
+  @front_app.notify_menu_page.clicklink(link: "Hands off flow: stop or reduce abstraction")
+  expect(@front_app.notify_add_contact_name_page.heading).to have_text("Add your contact information")
+  @front_app.notify_add_contact_name_page.submit(
+    contact_name: "Autopopulated name",
+    contact_job: "Autopopulated job"
+  )
+  expect(@front_app.notify_add_contact_details_page.heading).to have_text("Add your contact information")
+  @front_app.notify_add_contact_details_page.submit(
+    contact_email: "autopopulated_email@example.com",
+    contact_tel: "0117 496 0000",
+    # rubocop:disable Metrics/LineLength
+    contact_address: "Test Autopopulated Address\nDepartment for Environment, Food & Rural Affairs\nHorizon House\nDeanery Road\nBristol\nBS1 5AH"
+    # rubocop:enable Metrics/LineLength
+  )
+end
+
+Given(/^I can see my autopopulated details$/) do
+  # Bypass auto-populated info and only enter what's in the remaining fields:
+  @front_app.notify_custom_info_page.submit(
+    watercourse: "River Running",
+    gauging_station: "THIS IS A TEST",
+    hof_threshold: "0 metres cubed per second"
+  )
+  # rubocop:disable Metrics/LineLength
+  expect(@front_app.notify_confirm_message_page.message_preview).to have_text("If you have any questions about this notification, please contact Autopopulated name on 0117 496 0000 or autopopulated_email@example.com")
+  # rubocop:enable Metrics/LineLength
 end
 
 Given(/^I select the hands off flow warning template$/) do
@@ -133,7 +174,7 @@ Given(/^I can see the correct information on the confirm message page$/) do
     expect(@front_app.notify_confirm_message_page.number_of_recipients).to have_text(@notify_exp_recipient_count.to_s)
     # rubocop:disable Metrics/LineLength
     expect(@front_app.notify_confirm_message_page.message_preview).to have_text("All or part of the following abstraction licences will expire soon")
-    expect(@front_app.notify_confirm_message_page.message_preview).to have_text("To discuss any changes you would like to make please call us on 0114 2898 340")
+    expect(@front_app.notify_confirm_message_page.message_preview).to have_text("please send your renewal applications to us by 31 December 1999")
     # rubocop:enable Metrics/LineLength
   end
 
@@ -162,14 +203,17 @@ end
 Given(/^the notifications appear in the log$/) do
   expect(@front_app.notify_report_summary_page.first_notification).to have_text(@notification_type_long)
   # rubocop:disable Metrics/LineLength
-  expect(@front_app.notify_report_summary_page.first_sender).to have_text(Quke::Quke.config.custom["data"][@environment]["accounts"]["internal_user"]["username"])
+  expect(@front_app.notify_report_summary_page.first_sender).to have_text(Quke::Quke.config.custom["data"]["accounts"]["internal_user"])
   # rubocop:enable Metrics/LineLength
 end
 
 Given(/^I can view the details of the latest batch$/) do
   @front_app.notify_report_summary_page.first_notification.click
   expect(@front_app.notify_report_details_page.heading).to have_text(@notification_type_long.to_s)
-  expect(@front_app.notify_report_details_page.first_method).to have_text("Letter")
+  expect(@front_app.notify_report_details_page.details_table).to have_text("Email")
+  expect(@front_app.notify_report_details_page.details_table).to have_text("Letter")
+  expect(@front_app.notify_report_details_page.details_table).to have_text("Sent")
+  expect(@front_app.notify_report_details_page.details_table).to have_text("Coventry")
   @front_app.notify_report_details_page.notifications_link.click
 end
 

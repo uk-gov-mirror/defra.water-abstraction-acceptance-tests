@@ -19,13 +19,12 @@ class LicencesPage < SitePrism::Page
   # see https://github.com/natritmeyer/site_prism#element-collections
   elements(:view_links, ".license-result a")
   element(:first_licence, ".license-results-header+ .license-result a")
-  element(:licence_result_no, ".license-results-header+ .license-result a")
+  element(:licence_result_no, ".license-results-header+ .license-result .license-result__column--number")
   element(:licence_result_name, ".license-results-header+ .license-result .license-result__column--description")
   element(:email_form, "#emailAddress")
   element(:search_form, "#licenceNumber")
   element(:search_button, "#searchButton")
   element(:triangle, ".sort-icon")
-  element(:johnlicence, ".license-result:nth-child(133) .heading-medium") # 18/54/17/0361
   element(:firstlicence, ".license-results-header+ .license-result .heading-medium")
   element(:lastlicence, ".license-result:last-child .heading-medium")
   element(:pagetwo, ".pagination__item:nth-child(3) .pagination__link")
