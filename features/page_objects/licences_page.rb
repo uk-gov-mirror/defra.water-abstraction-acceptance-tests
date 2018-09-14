@@ -1,13 +1,19 @@
+require_relative "sections/govuk_banner.rb"
+require_relative "sections/tab_bar.rb"
+
 class LicencesPage < SitePrism::Page
 
   # Your water abstraction licences
 
+  section(:govuk_banner, GovukBanner, "#global-header") # Work in progress
+  section(:tab_bar, TabBar, ".navbar") # Work in progress
   element(:banner_links, ".header-proposition")
+  element(:sign_out_link, "#signout a")
   element(:view_licences_link, "#navbar-view a")
   element(:returns_link, "#navbar-returns a")
   element(:manage_licences_link, "#navbar-manage a")
   element(:notifications_link, ".active+ .navlink a")
-  element(:changepw, "#proposition-links .navlink:nth-child(2) a")
+  element(:changepw, "#change-password a")
   element(:navbar, ".navbar")
   element(:heading, ".heading-large")
   element(:content, "#content")
