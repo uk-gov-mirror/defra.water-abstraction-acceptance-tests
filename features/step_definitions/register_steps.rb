@@ -10,6 +10,8 @@ Given(/^I have no registered licences for "([^"]*)"$/) do |tasktype|
   # Get the document IDs for each licence to be unlinked as a single array:
   @unlink_ids = if tasktype == "registration"
                   Quke::Quke.config.custom["data"]["licence_reg_unlink"][@environment]
+                elsif tasktype == "returns"
+                  Quke::Quke.config.custom["data"]["licence_returns_unlink"][@environment]
                 else
                   Quke::Quke.config.custom["data"]["licence_some_unlink"][@environment]
                 end
@@ -25,15 +27,15 @@ Given(/^I register my email address on the service$/) do
   @front_app.sign_in_page.create_account_link.click
   @front_app.register_create_account_page.create_account_button.click
   # Variables such as the following are initialised in front_office_app.rb
-  @front_app.reg_email = @front_app.register_email_page.generate_email.to_s
-  @front_app.register_email_page.submit(email_address: @front_app.reg_email)
-  puts "Random email is: " + @front_app.reg_email
+  @reg_email = @front_app.register_email_page.generate_email.to_s
+  @front_app.register_email_page.submit(email_address: @reg_email)
+  puts "Random email is: " + @reg_email
 end
 
 Given(/^I receive an email with sign in details$/) do
   @environment = Quke::Quke.config.custom["environment"].to_s
   # rubocop:disable Metrics/LineLength
-  @email_api_url = ((Quke::Quke.config.custom["urls"][@environment]["root_url"]) + "/notifications/last?email=" + @front_app.reg_email).to_s
+  @email_api_url = ((Quke::Quke.config.custom["urls"][@environment]["root_url"]) + "/notifications/last?email=" + @reg_email).to_s
   # rubocop:enable Metrics/LineLength
   visit(@email_api_url)
   @email_json = @front_app.email_content_page.email_content.text
@@ -56,7 +58,7 @@ end
 Given(/^I sign in with my new email address$/) do
   @front_app.sign_in_page.load
   @front_app.sign_in_page.submit(
-    email: @front_app.reg_email.to_s,
+    email: @reg_email.to_s,
     password: Quke::Quke.config.custom["data"]["accounts"]["password"]
   )
 end
@@ -67,13 +69,17 @@ Then(/^I am on the add licences page$/) do
 end
 
 When(/^I register a licence for "([^"]*)"$/) do |tasktype|
-  @front_app.licence_reg = if tasktype == "registration"
-                             Quke::Quke.config.custom["data"]["licence_reg_one"].to_s
-                           else
-                             Quke::Quke.config.custom["data"]["licence_one"].to_s
-                           end
+  @licence_reg = if tasktype == "registration"
+                   Quke::Quke.config.custom["data"]["licence_reg_one"].to_s
+                 elsif tasktype == "returns"
+                   Quke::Quke.config.custom["data"]["licence_returns"].to_s
+                 else # refresh the data
+                   Quke::Quke.config.custom["data"]["licence_one"].to_s
+                 end
   @licence_multi = if tasktype == "registration"
                      Quke::Quke.config.custom["data"]["licence_reg_some"].to_s
+                   elsif tasktype == "returns"
+                     Quke::Quke.config.custom["data"]["licence_returns"].to_s
                    else
                      Quke::Quke.config.custom["data"]["licence_some"].to_s
                    end
@@ -82,9 +88,10 @@ When(/^I register a licence for "([^"]*)"$/) do |tasktype|
     licence_box: @licence_multi
   )
   @front_app.register_confirm_licences_page.wait_for_continue_button
-  @front_app.register_confirm_licences_page.submit
+  @front_app.register_confirm_licences_page.continue_button.click
   @front_app.register_choose_address_page.wait_for_continue_button
-  @front_app.register_choose_address_page.submit
+  @front_app.register_choose_address_page.address_radio.click
+  @front_app.register_choose_address_page.continue_button.click
 end
 
 When(/^an admin user can read the code$/) do
@@ -96,13 +103,13 @@ When(/^an admin user can read the code$/) do
     password: Quke::Quke.config.custom["data"]["accounts"]["password"]
   )
   @front_app.licences_page.search(
-    search_form: @front_app.licence_reg.to_s
+    search_form: @licence_reg.to_s
   )
-  @front_app.licences_page.submit(licence: @front_app.licence_reg)
-  expect(@front_app.licence_details_page.heading).to have_text(@front_app.licence_reg)
+  find_link(@licence_reg).click
+  expect(@front_app.licence_details_page.heading).to have_text(@licence_reg)
   @security_code = @front_app.licence_details_page.confirmation_first_code.text
   puts "Confirmation code is: " + @security_code + "."
-  @front_app.licence_details_page.sign_out_link.click
+  @front_app.licence_details_page.govuk_banner.sign_out_link.click
 end
 
 When(/^I enter my confirmation code$/) do
@@ -113,6 +120,6 @@ When(/^I enter my confirmation code$/) do
 end
 
 When(/^I select a licence I registered$/) do
-  @front_app.licences_page.submit(licence: @front_app.licence_reg)
-  expect(@front_app.licence_details_page.heading).to have_text(@front_app.licence_reg)
+  find_link(@licence_reg).click
+  expect(@front_app.licence_details_page.heading).to have_text(@licence_reg)
 end

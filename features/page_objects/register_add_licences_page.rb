@@ -1,4 +1,10 @@
+require_relative "sections/govuk_banner.rb"
+require_relative "sections/nav_bar.rb"
+
 class RegisterAddLicencesPage < SitePrism::Page
+
+  section(:govuk_banner, GovukBanner, GovukBanner::SELECTOR)
+  section(:nav_bar, NavBar, NavBar::SELECTOR)
 
   element(:heading, ".heading-large")
   element(:error_heading, "#error-summary-heading-example-2")

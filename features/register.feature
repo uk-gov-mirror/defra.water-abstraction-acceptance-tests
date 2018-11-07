@@ -1,4 +1,4 @@
-@readwrite
+@test @register
 Feature: [WATER-528 and 560] Register and share
   As a user with a water abstraction licence
   I want to register with the service
@@ -30,7 +30,7 @@ Scenario: [WATER-560 and 565] Share and revoke access
   Given I am on the sign in page
   And I sign into my account as "external_user"
   When I add an agent to view my licences
-  Then the agent can log in and view a licence I own
+  Then the agent can log in and view a licence I can access
 
   Given I sign into my account as "external_user"
   When I remove an agent to view my licences
