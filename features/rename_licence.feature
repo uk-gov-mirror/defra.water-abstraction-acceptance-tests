@@ -1,4 +1,4 @@
-@test @rename
+@test @rename @preprod
 Feature: [WATER-564] Rename licence
   As a business with a water abstraction licence
   I want to be able to check my licence details
@@ -27,7 +27,7 @@ Feature: [WATER-564] Rename licence
     When I enter a valid licence name
     Then the expected licence name appears on the licence summary page
     And the licence name is searchable on the abstraction licences page
-    And all licences containing that term are shown on screen
+    And the correct search results are shown
 
   Scenario: [WATER-564] Reset licence name
     When I reset the licence name
