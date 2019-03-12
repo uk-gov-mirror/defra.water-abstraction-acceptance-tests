@@ -22,7 +22,7 @@ Given(/^I can view a return that is "([^"]*)"$/) do |returntype|
     expect(@front_app.return_details_page.freq_heading).to have_text("Day")
     expect(@front_app.return_details_page.unit_heading).to have_text("Cubic metres")
     expect(@front_app.return_details_page.data_table).to have_text("March")
-    expect(@first_reading).to be > 0
+    expect(@first_reading.positive?).to eq(true)
 
   elsif @return_type == "nil"
     @return_licence_link = Quke::Quke.config.custom["data"]["return_nil"].to_s
@@ -108,13 +108,7 @@ Given(/^I "([^"]*)" a return of type "([^"]*)"$/) do |action, flow|
     find_link(@licence_returns).click
     @front_app.licence_details_page.returns_tab.click
     @front_app.licence_details_page.first_return.click
-
-    # TEMPORARY STEP to select the action to submit the return.
-    # Remove this and uncomment the next step once WATER-1954 is fixed.
-    @front_app.return_routes_page.first_action_radio.click
-
-    # Next step is temporarily broken due to bug WATER-1954
-    # @front_app.return_details_page.edit_return_button.click
+    @front_app.return_details_page.edit_return_button.click
 
     # Should show "enter and submit return" and "log a problem" options.
     expect(@front_app.return_routes_page.heading).to have_text("Abstraction return for")
