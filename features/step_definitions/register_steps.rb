@@ -13,12 +13,15 @@ Given(/^I have no registered licences for "([^"]*)"$/) do |tasktype|
                   Quke::Quke.config.custom["data"]["licence_reg_unlink"][@environment]
                 elsif tasktype == "returns"
                   Quke::Quke.config.custom["data"]["licence_returns_unlink"][@environment]
+                elsif tasktype == "switching companies"
+                  Quke::Quke.config.custom["data"]["licence_company2_unlink"][@environment]
                 else
                   Quke::Quke.config.custom["data"]["licence_some_unlink"][@environment]
                 end
   visit(@back_login)
   # Unlink each licence by visiting the URL generated from each document ID:
   @unlink_ids.each { |id| visit(@back_root + "crm/document/" + id.to_s + "/unlink") }
+  page.execute_script "window.close();"
 end
 
 Given(/^I register my email address on the service$/) do
@@ -37,11 +40,9 @@ Given(/^I register my email address on the service$/) do
   puts "Random email is: " + @reg_email
 
   # Also test the "not received email screen":
-  # NEXT 3 STEPS BROKEN
-
-  # @front_app.register_email_page.not_received_email_link.click
-  # expect(@front_app.register_email_page.heading).to have_text("Request another email")
-  # @front_app.register_email_page.submit(email_address: @reg_email)
+  @front_app.register_email_page.not_received_email_link.click
+  expect(@front_app.register_email_page.heading).to have_text("Request another email")
+  @front_app.register_email_page.submit(email_address: @reg_email)
 
   # Now read the contents of the last email sent to the random email address that was just generated.
   # The contents are displayed via an API that was created specifically for the automated tests.
@@ -53,12 +54,15 @@ Given(/^I register my email address on the service$/) do
   @email_json = @front_app.email_content_page.email_content.text
 
   # Finds the text in the API JSON between the following two strings:
-  # account: \r\n\r\n#
-  # \r\n\r\nIf
+  # reset it here: (with trailing space)
+  #  \r\n\r\nIf (with leading space)
   # Regex format used: Find all text between the first instance of 001 and 002
   # @create_account_url = @email_json[/001(.*?)002/,1].to_s
   # See https://stackoverflow.com/questions/4218986/ruby-using-regex-to-find-something-in-between-two-strings
-  @create_account_url = @email_json[/account: \\r\\n\\r\\n#(.*?)\\r\\n\\r\\nIf/, 1].to_s
+  # The link for the first email would be:
+  # @create_account_url = @email_json[/account: \\r\\n\\r\\n#(.*?)\\r\\n\\r\\nIf/, 1].to_s
+  # Password reset link from the second email received:
+  @create_account_url = @email_json[/reset it here: (.*?) \\r\\n\\r\\nIf/, 1].to_s
 
   # Go to the URL that was in the email contents:
   visit(@create_account_url)
@@ -88,6 +92,8 @@ When(/^I register a licence for "([^"]*)"$/) do |tasktype|
                    Quke::Quke.config.custom["data"]["licence_reg_one"].to_s
                  elsif tasktype == "returns"
                    Quke::Quke.config.custom["data"]["licence_returns"].to_s
+                 elsif tasktype == "switching companies"
+                   Quke::Quke.config.custom["data"]["licence_company2"].to_s
                  else # refresh the data
                    Quke::Quke.config.custom["data"]["licence_one"].to_s
                  end
@@ -95,6 +101,8 @@ When(/^I register a licence for "([^"]*)"$/) do |tasktype|
                      Quke::Quke.config.custom["data"]["licence_reg_some"].to_s
                    elsif tasktype == "returns"
                      Quke::Quke.config.custom["data"]["licence_returns"].to_s
+                   elsif tasktype == "switching companies"
+                     Quke::Quke.config.custom["data"]["licence_company2"].to_s
                    else
                      Quke::Quke.config.custom["data"]["licence_some"].to_s
                    end
@@ -115,6 +123,7 @@ When(/^I register a licence for "([^"]*)"$/) do |tasktype|
   @front_app.register_choose_address_page.wait_for_continue_button
   @front_app.register_choose_address_page.address_radio.click
   @front_app.register_choose_address_page.continue_button.click
+  @front_app.register_sending_letter_page.sign_out_link.click
 end
 
 When(/^an admin user can read the code$/) do

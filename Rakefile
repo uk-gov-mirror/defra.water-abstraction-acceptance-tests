@@ -38,6 +38,7 @@ task :test do
   sh %( bundle exec quke --tags @rename)
   sh %( bundle exec quke --tags @returns)
   sh %( bundle exec quke --tags @search)
+  sh %( bundle exec quke --tags @switch)
 end
 
 # Run this on preprod and prod
