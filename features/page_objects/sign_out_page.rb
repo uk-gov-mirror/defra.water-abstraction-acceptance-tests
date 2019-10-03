@@ -1,6 +1,6 @@
 class SignOutPage < SitePrism::Page
 
-  element(:heading, ".clustered")
-  element(:sign_in_link, ".clustered+ a")
+  element(:heading, ".govuk-heading-l")
+  element(:sign_in_link, "#main-content p")
 
 end

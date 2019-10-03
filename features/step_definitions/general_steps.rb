@@ -81,7 +81,7 @@ Given(/^I start renaming a licence$/) do
 end
 
 Given(/^I enter a valid licence name$/) do
-  @expected_licence_name = "'Renameobot'"
+  @expected_licence_name = "Renameobot"
   @front_app.licence_details_page.submit(licence_name_form: @expected_licence_name)
 end
 
@@ -112,18 +112,24 @@ end
 
 Given(/^I access the back end as "([^"]*)"$/) do |account|
   expect(production?).to be false
-  @environment = Quke::Quke.config.custom["environment"].to_s
-
+  @environment = config_environment
   @back_app = BackOfficeApp.new
-  # Create the back office URL by combining the username, password and root URL.
-  @back_root = Quke::Quke.config.custom["urls"][@environment]["back_office_root"].to_s
-  # rubocop:disable Metrics/LineLength
-  @back_credentials = (Quke::Quke.config.custom["data"]["accounts"][account.to_s] + ":" + Quke::Quke.config.custom["data"]["accounts"]["password"] + "@").to_s
-  # rubocop:enable Metrics/LineLength
-  # This is the full URL to visit, containing the credentials.
-  # Insert username and password from 8th character:
-  @back_login = @back_root.insert(8, @back_credentials)
-  visit(@back_login)
+
+  if account == "internal_user"
+    @back_internal = Quke::Quke.config.custom["urls"][@environment]["back_office_login"].to_s
+    visit(@back_internal)
+  else
+    # Create the back office URL by combining the username, password and root URL.
+    @back_root = Quke::Quke.config.custom["urls"][@environment]["back_office_root"].to_s
+
+    @back_credentials = config_accounts(account.to_s) + ":" + config_accounts("password") + "@"
+
+    # This is the full URL to visit, containing the credentials.
+    # Insert username and password from 8th character:
+    @back_login = @back_root.insert(8, @back_credentials)
+    puts "Back login: #{@back_login}"
+    visit(@back_login)
+  end
 end
 
 Given(/^I can see the back end page$/) do
@@ -131,5 +137,5 @@ Given(/^I can see the back end page$/) do
 end
 
 Given(/^I cannot see the back end page$/) do
-  expect(@back_app.back_office_start_page.heading).to not_have_text("Permit Repository Admin")
+  expect(@back_app.back_office_start_page.has_heading?).to be false
 end

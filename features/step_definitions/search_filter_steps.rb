@@ -17,13 +17,12 @@ Given(/^I can see a full page of licences$/) do
 end
 
 Given(/^I can see the correct number of pagination links$/) do
-  @environment = Quke::Quke.config.custom["environment"].to_s
-  @expected_pages = Quke::Quke.config.custom["data"]["total_pages"][@environment]
-  expect(@front_app.licences_page.pagination_text).to have_text(@expected_pages.to_s)
+  expect(@front_app.internal_search_results_page).to have_pagination_details
+  expect(@front_app.internal_search_results_page).to have_link_to_next_page_of_results
 end
 
 Given(/^I search for (?:a|an) "([^"]*)" licence$/) do |licencetype|
-  @environment = Quke::Quke.config.custom["environment"].to_s
+  @licencetype = licencetype
   @expected_search_result = Quke::Quke.config.custom["data"]["licence_" + licencetype.to_s].to_s
   @front_app.licences_page.search(
     search_input: @expected_search_result.to_s
@@ -32,7 +31,7 @@ end
 
 Given(/^I search for a partial licence number$/) do
   @expected_search_result = "29/01/*G"
-  @expected_result_count = 5
+  @expected_result_count = 10
   @front_app.licences_page.search(
     search_input: @expected_search_result.to_s
   )
@@ -47,6 +46,10 @@ Given(/^I search for a return$/) do
   )
 end
 
+Then(/^the search results contain a link to the return$/) do
+  expect(@front_app.internal_search_results_page).to have_link_to_searched_return
+end
+
 Then(/^I can access the return details$/) do
   find_link(@expected_search_result).click
   expect(@front_app.return_details_page.heading).to have_text("Abstraction return for")
@@ -59,24 +62,16 @@ Then(/^I can access the return details$/) do
 end
 
 When(/^I search for an "([^"]*)"$/) do |user_type|
-  @expected_search_result = Quke::Quke.config.custom["data"]["accounts"][user_type.to_s]
-  @expected_result_count = if user_type == "external_user"
-                             1
-                           else
-                             2 # because the internal user also has an admin account which is shown
-                           end
-  @expected_user_type = if user_type == "external_user"
-                          "External"
-                        else
-                          "Internal"
-                        end
-  @front_app.licences_page.search(
-    search_input: @expected_search_result.to_s
-  )
+  @expected_search_result = config_accounts(user_type.to_s)
+
+  # because the internal user also has an admin account which is shown
+  @expected_result_count = user_type == "external_user" ? 1 : 2
+  @expected_user_type = user_type == "external_user" ? "External" : "Internal"
+
+  @front_app.licences_page.search(search_input: @expected_search_result)
 end
 
 Then(/^I can access the user details$/) do
-  # @front_app.licences_page.clickfirstlink(link: @expected_search_result)
   click_link(@expected_search_result, match: :first)
   expect(@front_app.user_details_page.caption).to have_text(@expected_user_type)
   expect(@front_app.user_details_page.heading).to have_text(@expected_search_result)
@@ -99,8 +94,11 @@ Given(/^the correct search results are shown$/) do
     expect(@front_app.licences_page).to have_email_links count: @expected_result_count.to_i
   elsif @user_type == "external_user"
     expect(@front_app.licences_page).to have_licence_links_external count: @expected_result_count.to_i
-  else
+  elsif @front_app.licences_page.has_licence_links_internal?
+    puts @expected_result_count
     expect(@front_app.licences_page).to have_licence_links_internal count: @expected_result_count.to_i
+  else
+    expect(@front_app.licences_page).to have_licence_links_internal1 count: @expected_result_count.to_i
   end
 end
 
@@ -113,7 +111,14 @@ Given(/^I enter a search term which does not exist on screen$/) do
 end
 
 Given(/^I cannot see any licences$/) do
-  expect(@front_app.licences_page).to have_text("No results found.")
+  case @licencetype
+  when "expired"
+    expect(@front_app.licences_page).to have_text("EXPIRED")
+  when "revoked"
+    expect(@front_app.licences_page).to have_text("EXPIRED")
+  when "lapsed"
+    expect(@front_app.licences_page).to have_text("EXPIRED")
+  end
 end
 
 Given(/^I remove a search term$/) do
@@ -133,9 +138,7 @@ Given(/^I can see the original number of licences$/) do
 end
 
 Given(/^I enter an email address on the licence holder's email field$/) do
-  @expected_search_result = Quke::Quke.config.custom["data"]["accounts"]["external_user"].to_s
+  @expected_search_result = config_accounts("external_user")
   @expected_result_count = 1
-  @front_app.licences_page.search(
-    search_input: Quke::Quke.config.custom["data"]["accounts"]["external_user"]
-  )
+  @front_app.licences_page.search(search_input: expected_search_result)
 end

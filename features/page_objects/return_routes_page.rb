@@ -1,33 +1,25 @@
 class ReturnRoutesPage < SitePrism::Page
 
-  element(:heading, ".heading-large")
-  element(:content, "#content")
-  element(:question, ".heading-medium")
+  element(:heading, "h1.govuk-heading-l")
 
-  # Radio buttons - use unique html attributes.
-  element(:first_action_radio, "input[id='radio-inline-0']", visible: false)
-  element(:second_action_radio, "input[id='radio-inline-1']", visible: false)
+  element(:question, "form .govuk-fieldset__legend.govuk-fieldset__legend--m")
+  element(:question1, ".govuk-heading-m")
+  element(:question2, ".heading-medium")
+  element(:question3, ".govuk-fieldset__legend")
+
   # These use the same identifiers but different options.
-  element(:enter_radio, "input[id='radio-inline-0']", visible: false)
-  element(:query_radio, "input[id='radio-inline-1']", visible: false)
+  element(:enter_radio, ".govuk-radios__item:nth-child(1) .govuk-radios__input", visible: false)
+
   # Do you have volumes to report? / Is it a single amount? / One or more meters?
-  element(:yes_radio, "input[id='radio-inline-0']", visible: false)
-  element(:no_radio, "input[id='radio-inline-1']", visible: false)
+  element(:yes_radio1, "#radio-inline-0", visible: false)
+  element(:no_radio2, "#radio-inline-1", visible: false)
   # How are you reporting your return?
   element(:method_meter_radio, "input[id='radio-inline-0']", visible: false)
   element(:method_volume_radio, "input[id='radio-inline-1']", visible: false)
   # What is the unit of measurement?
-  element(:unit_m3_radio, "input[id='radio-inline-0']", visible: false)
-  element(:unit_l_radio, "input[id='radio-inline-1']", visible: false)
-  element(:unit_Ml_radio, "input[id='radio-inline-2']", visible: false)
-  element(:unit_gal_radio, "input[id='radio-inline-3']", visible: false)
+  element(:unit_gal_radio, ".govuk-radios__item:nth-child(4) .govuk-radios__label", visible: false)
 
-  element(:meter_manufacturer_form, "#manufacturer")
-  element(:meter_serialnumber_form, "#serialNumber")
-  element(:meter_start_reading_form, "#startReading")
-  element(:meter_x10_checkbox, "input[name='isMultiplier']", visible: false)
-
-  element(:nil_return_heading, "h3")
+  element(:nil_return_heading, "h2", match: :first)
   element(:continue_button, "button")
 
   def submit(args = {})

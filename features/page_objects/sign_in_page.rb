@@ -1,19 +1,22 @@
 class SignInPage < SitePrism::Page
+  url = external_url(:sign_in)
+  set_url(url)
 
-  @environment = Quke::Quke.config.custom["environment"].to_s
-  set_url(Quke::Quke.config.custom["urls"][@environment]["front_office_sign_in"])
-
-  element(:email, "#user-id")
+  element(:email, "#email")
   element(:password, "#password")
-  element(:error_heading, "#error-summary-heading")
-  element(:submit_button, "#signInButton")
-  element(:forgotten_password, ".form+ a")
+  element(:error_heading, ".govuk-error-summary__list")
+  element(:submit_button, "button[type='submit']")
+  element(:forgotten_password, "#main-content a:nth-child(1)")
   element(:create_account_link, "br+ a")
 
   def submit(args = {})
     email.set(args[:email]) if args.key?(:email)
     password.set(args[:password]) if args.key?(:password)
     submit_button.click
+  end
+
+  def submit_credentials(email = "", password = "")
+    submit(email: email, password: password)
   end
 
   def lock_account(args = {})

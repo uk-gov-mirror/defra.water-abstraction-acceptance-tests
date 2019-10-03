@@ -53,6 +53,10 @@ class FrontOfficeApp
     @last_page = FlowLevelPage.new
   end
 
+  def internal_search_results_page
+    @last_page = InternalSearchResultsPage.new
+  end
+
   def licence_conditions_page
     @last_page = LicenceConditionsPage.new
   end
@@ -75,6 +79,10 @@ class FrontOfficeApp
 
   def licences_page
     @last_page = LicencesPage.new
+  end
+
+  def manage_page
+    @last_page = ManagePage.new
   end
 
   def manage_access_removed_page
@@ -193,6 +201,14 @@ class FrontOfficeApp
     @last_page = ReturnCheckPage.new
   end
 
+  def return_has_water_been_abstracted
+    @last_page = ReturnHasWaterBeenAbstractedPage.new
+  end
+
+  def return_date_received_page
+    @last_page = ReturnDateReceivedPage.new
+  end
+
   def return_details_page
     @last_page = ReturnDetailsPage.new
   end
@@ -209,8 +225,20 @@ class FrontOfficeApp
     @last_page = ReturnsPage.new
   end
 
+  def return_meters_or_readings_page
+    @last_page = ReturnMetersOrReadingsPage.new
+  end
+
+  def return_meter_details_provided_page
+    @last_page = ReturnMeterDetailsProvidedPage.new
+  end
+
   def return_routes_page
     @last_page = ReturnRoutesPage.new
+  end
+
+  def return_units_page
+    @last_page = ReturnUnitsPage.new
   end
 
   def sign_in_page

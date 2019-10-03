@@ -2,7 +2,7 @@
 Feature: [WATER-563] Search for things
 
 Background:
-  Given I am on the sign in page
+  Given I am on the sign in page for "internal_user"
   And I sign into my account as "internal_user"
   And I am on the internal abstraction licences page
 
@@ -23,16 +23,18 @@ Scenario: [WATER-526 and 563] Search licences
 Scenario: [WATER-1831] Search for a return
   When I search for a return
   Then the correct search results are shown
-  And I can access the return details
+  And the search results contain a link to the return
 
-Scenario: [WATER_1831] Search for users
+Scenario: Search for external user
   When I search for an "external_user"
   Then the correct search results are shown
   And I can access the user details
 
-  When I search for an "internal_user"
-  Then the correct search results are shown
-  And I can access the user details
+
+# Scenario: Search for internal user
+#   When I search for an "internal_user"
+#   Then the correct search results are shown
+#   And I can access the user details
 
 Scenario: [WATER-922] Licence sanity check
   When I select a second page of many licences

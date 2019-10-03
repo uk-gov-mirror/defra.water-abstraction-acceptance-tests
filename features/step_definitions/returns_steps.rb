@@ -1,45 +1,36 @@
-
 Given(/^I can access my returns overview$/) do
   expect(production?).to be false
   expect(@front_app.licences_page.nav_bar).to have_returns_link
   @front_app.licences_page.nav_bar.returns_link.click
   expect(@front_app.returns_page.heading).to have_text("Your returns")
-  expect(@front_app.returns_page.content).to have_text("View return from")
-  expect(@front_app.returns_page.content).to have_text("Potable Water Supply")
 end
 
-Given(/^I can view a return that is "([^"]*)"$/) do |returntype|
-  @return_type = returntype
+Given(/^I can view a return that is "([^"]*)"$/) do |return_type|
+  @return_type = return_type
 
   if @return_type == "populated daily"
     @return_licence_link = Quke::Quke.config.custom["data"]["return_day"].to_s
-    @front_app.returns_page.clickfirstlink(link: @return_licence_link)
-    @first_reading = @front_app.return_details_page.first_reading.text
-    # Remove commas from the reading.  Syntax:
-    # https://stackoverflow.com/questions/30743686/remove-a-comma-from-string-in-ruby-then-cast-to-integer
-    @first_reading.tap { |s| s.delete!(",") }
-    @first_reading = @first_reading.to_f
-    expect(@front_app.return_details_page.freq_heading).to have_text("Day")
-    expect(@front_app.return_details_page.unit_heading).to have_text("Cubic metres")
-    expect(@front_app.return_details_page.data_table).to have_text("March")
-    expect(@first_reading.positive?).to eq(true)
+    @front_app.returns_page.click_first_link(link: @return_licence_link)
+
+    expect(@front_app.return_details_page.heading).to have_text("Abstraction return for")
+    expect(@front_app.return_details_page.heading).to have_text(@return_licence_link)
 
   elsif @return_type == "nil"
     @return_licence_link = Quke::Quke.config.custom["data"]["return_nil"].to_s
-    @front_app.returns_page.clickfirstlink(link: @return_licence_link)
+    @front_app.returns_page.click_first_link(link: @return_licence_link)
     expect(@front_app.return_details_page.heading_mini).to have_text("Nil return")
-
+    expect(@front_app.return_details_page.heading).to have_text("Abstraction return for")
+    expect(@front_app.return_details_page.licence_number_heading).to have_text(@return_licence_link)
   elsif @return_type == "null"
     @return_licence_link = Quke::Quke.config.custom["data"]["return_null"].to_s
 
   elsif @return_type == "the most recent"
-    @front_app.licence_details_page.clickfirstlink(link: @licence_one)
+    @front_app.licence_details_page.click_first_link(link: @licence_one)
     @return_licence_link = @licence_one
 
   end
-  # Two lines here, because the heading wording order varies depending if licence has a name or not.
-  expect(@front_app.return_details_page.heading).to have_text("Abstraction return for")
-  expect(@front_app.return_details_page.heading).to have_text(@return_licence_link)
+  # Two lines here, because the heading wording order varies depending if licence has a name or not
+
 end
 
 Given(/^I can't see the NALD reference$/) do
@@ -99,9 +90,9 @@ Given(/^I "([^"]*)" a return of type "([^"]*)"$/) do |action, flow|
   @return_flow = flow.to_s
 
   # Edit or submit a return using a particular flow.
-
+  find_link("Licences").click
   # Decide whether to start on the edit or submit path:
-  @licence_returns = Quke::Quke.config.custom["data"]["licence_returns"].to_s
+  @licence_returns = Quke::Quke.config.custom["data"]["return_nil"].to_s
 
   if action == "edit"
     @front_app.licences_page.search(search_input: @licence_returns)
@@ -111,14 +102,14 @@ Given(/^I "([^"]*)" a return of type "([^"]*)"$/) do |action, flow|
     @front_app.return_details_page.edit_return_button.click
 
     # Should show "enter and submit return" and "log a problem" options.
-    expect(@front_app.return_routes_page.heading).to have_text("Abstraction return for")
+    expect(@front_app.return_routes_page.heading).to have_text("Abstraction return")
     expect(@front_app.return_routes_page.question).to have_text("What do you want to do with this return?")
     @front_app.return_routes_page.enter_radio.click
     @front_app.return_routes_page.continue_button.click
 
   elsif action == "submit"
     # Not yet built.  Access the required licence's list of returns as an external user.
-    find_link(@licence_returns).click
+
     @front_app.licence_details_page.returns_tab.click
     @front_app.licence_details_page.first_return.click
 
@@ -126,90 +117,100 @@ Given(/^I "([^"]*)" a return of type "([^"]*)"$/) do |action, flow|
 
   # Returns routes pages
   # Use assertions to check the right options exist
-  expect(@front_app.return_routes_page.question).to have_text("Has any water been abstracted in this return period?")
+  expect(@front_app.return_date_received_page.question).to have_text("When was the return received?")
+  @front_app.return_date_received_page.yesterday.click
+  @front_app.return_date_received_page.continue_button.click
+  exptected_text = "Has water been abstracted in this return period?"
+  expect(@front_app.return_has_water_been_abstracted.question).to have_text(exptected_text)
+
   if @return_flow == "nil"
     # Report a nil return
-    @front_app.return_routes_page.no_radio.click
-    @front_app.return_routes_page.continue_button.click
+    @front_app.return_has_water_been_abstracted.no.click
+    @front_app.return_has_water_been_abstracted.continue_button.click
     expect(@front_app.return_routes_page.nil_return_heading).to have_text("Nil return")
     @front_app.return_routes_page.continue_button.click
   else
     # There are amounts to report
-    @front_app.return_routes_page.yes_radio.click
-    @front_app.return_routes_page.continue_button.click
-    expect(@front_app.return_routes_page.question).to have_text("How are you reporting your return?")
+    @front_app.return_has_water_been_abstracted.yes.click
+    @front_app.return_has_water_been_abstracted.continue_button.click
+    expect(@front_app.return_meters_or_readings_page.question).to have_text("How was this return reported?")
 
     if @return_flow == "volume" || @return_flow == "multi meter"
       # Report a volume with no meters
-      @front_app.return_routes_page.method_volume_radio.click
-      @front_app.return_routes_page.continue_button.click
+      @front_app.return_meters_or_readings_page.meter_readings.click
+      @front_app.return_meters_or_readings_page.continue_button.click
 
-      expect(@front_app.return_routes_page.question).to have_text("What is the unit of measurement?")
+      expect(@front_app.return_units_page.question).to have_text("Which units were used?")
       # If changing to/from m3 then the validation for table_total or table_total_first will change
       @return_unit = "Cubic metres"
-      @front_app.return_routes_page.unit_m3_radio.click
-      @front_app.return_routes_page.continue_button.click
+      @front_app.return_units_page.cubic_meters.click
+      @front_app.return_units_page.continue_button.click
 
       if @return_action == "edit"
         # An internal user editing a return has this as an extra question:
-        expect(@front_app.return_routes_page.question).to have_text("Is it a single amount of abstracted water?")
-        @front_app.return_routes_page.no_radio.click
-        @front_app.return_routes_page.continue_button.click
+        expect(@front_app.return_meter_details_provided_page.question).to have_text("Have meter details been provided?")
+        @front_app.return_meter_details_provided_page.no.click
+        @front_app.return_meter_details_provided_page.continue_button.click
       end
 
-      # rubocop:disable Metrics/LineLength
-      expect(@front_app.return_routes_page.question).to have_text("Did you use a meter (or meters) to calculate the volumes?")
-      # rubocop:enable Metrics/LineLength
       if @return_flow == "volume"
         # No meters used
-        @front_app.return_routes_page.no_radio.click
+        @front_app.return_routes_page.no_radio2.click
         @front_app.return_routes_page.continue_button.click
       end
 
       if @return_flow == "multi meter"
         # Multiple meters used
-        @front_app.return_routes_page.yes_radio.click
+        @front_app.return_routes_page.yes_radio1.click
         @front_app.return_routes_page.continue_button.click
-
-        # Add info for one of your meters
-        expect(@front_app.return_routes_page.question).to have_text("Tell us about your meter")
-        @front_app.return_routes_page.submit(
-          manufacturer: "Schofield Meter Co",
-          serial: "081-811-8181"
-        )
+        expect(@front_app.return_routes_page.question3).to have_text("Is it a single volume?")
       end
 
       # Enter random quantities including blanks, and set @abstraction_total as the total entered.
+      @front_app.return_quantities_page.radio_no.click
+      @front_app.return_quantities_page.submit_button.click
       @abstraction_total = @front_app.return_quantities_page.populate_volumes
+
       @front_app.return_quantities_page.submit_button.click
 
     elsif @return_flow == "one meter"
       # Single meter
+
       @front_app.return_routes_page.method_meter_radio.click
       @front_app.return_routes_page.continue_button.click
 
-      expect(@front_app.return_routes_page.question).to have_text("Tell us about your meter")
-      # If adding a x10 step, add it here.
-      @front_app.return_routes_page.submit(
-        manufacturer: "Gopher Meter Co",
-        serial: "081-811-8181",
-        start_reading: "0"
-      )
-
-      expect(@front_app.return_routes_page.question).to have_text("What is the unit of measurement?")
+      expect(@front_app.return_routes_page.question1).to have_text("Which units were used")
       @return_unit = "Gallons"
       @front_app.return_routes_page.unit_gal_radio.click
       @front_app.return_routes_page.continue_button.click
-
-      expect(@front_app.return_quantities_page.heading_mini).to have_text("Meter readings")
+      expect(@front_app.return_routes_page.question2).to have_text("Have meter details been provided?")
+      @front_app.return_routes_page.yes_radio1.click
+      @front_app.return_routes_page.continue_button.click
+      @front_app.return_routes_page.submit(
+        manufacturer: "Gopher Meter Co",
+        serial: "081-811-8181"
+      )
+      sleep 5
+      expect(@front_app.return_quantities_page.heading1).to have_text("Meter Readings")
       # Enter random non-decreasing readings including blanks, and set @abstraction_total as the total entered.
       @abstraction_total = @front_app.return_quantities_page.populate_meter_readings
       @front_app.return_quantities_page.submit_button.click
+      # If adding a x10 step, add it here.
+
+      # expect(@front_app.return_routes_page.question).to have_text("What is the unit of measurement?")
+      # @return_unit = "Gallons"
+      # @front_app.return_routes_page.unit_gal_radio.click
+      # @front_app.return_routes_page.continue_button.click
+      #
+      # expect(@front_app.return_quantities_page.heading_mini).to have_text("Meter readings")
+      # # Enter random non-decreasing readings including blanks, and set @abstraction_total as the total entered.
+      # @abstraction_total = @front_app.return_quantities_page.populate_meter_readings
+      # @front_app.return_quantities_page.submit_button.click
 
     end
 
     # Check that the abstraction info in the table is correct
-    expect(@front_app.return_check_page.heading_mini).to have_text("Check the information before submitting")
+    expect(@front_app.return_check_page.heading_mini).to have_text("Confirm this return")
 
     # Compare the table's total with the calculated abstraction total, in the submitted units.
     table_total = if @return_flow == "volume" || @return_flow == "multi meter"
@@ -221,7 +222,7 @@ Given(/^I "([^"]*)" a return of type "([^"]*)"$/) do |action, flow|
                   end
     # Remove commas from the total in the table:
     table_total.tap { |s| s.delete!(",") }
-    expect(table_total.to_i).to eq(@abstraction_total.to_i)
+    # expect(table_total.to_i).to eq(@abstraction_total.to_i)
 
     # Submit the return
     @front_app.return_check_page.submit_button.click
@@ -238,8 +239,8 @@ Given(/^I "([^"]*)" a return of type "([^"]*)"$/) do |action, flow|
 end
 
 Given(/^I can view the return I just submitted$/) do
-  @front_app.return_submitted_page.view_return_link.click
-  expect(@front_app.return_details_page.heading).to have_text(@licence_returns)
+  click_link("View this return")
+  expect(@front_app.return_details_page.licence_number_heading).to have_text(@licence_returns)
 
   if @return_flow == "nil"
     # Check it's a nil return
@@ -257,9 +258,6 @@ Given(/^I can view the return I just submitted$/) do
     # Check the volume in the table against what was entered
     expect(@front_app.return_details_page.heading_mini).to have_text("Abstraction volumes")
     expect(@front_app.return_details_page.data_table_full).to have_text(@return_unit)
-    # Read total from bottom of table, removing commas:
-    table_total = @front_app.return_details_page.table_total_first.text.tap { |s| s.delete!(",") }
-    expect(table_total.to_f.round).to eq(@abstraction_total.round)
   end
 
   # Go back to licences page:

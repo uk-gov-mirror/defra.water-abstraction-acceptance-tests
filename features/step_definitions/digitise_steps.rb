@@ -4,8 +4,8 @@ Given(/^I reset a licence back to in progress$/) do
 
   # Search for a licence
   find_link("Digitise!").click # Can't use selector due to bug WATER-1905
-  @front_app.digitise_page.wait_for_heading
-  @front_app.digitise_page.wait_for_search_form
+  @front_app.digitise_page.wait_until_heading_visible
+  @front_app.digitise_page.wait_until_search_form_visible
   @front_app.digitise_page.search(search_form: @ar_licence)
   @front_app.digitise_page.single_result.click
   expect(@front_app.digitise_review_page.content).to have_text(@ar_licence)
@@ -25,8 +25,8 @@ Given(/^I propose changes to a licence$/) do
 
   # Go to AR screens
   @front_app.licences_page.nav_bar.ar_link.click
-  @front_app.digitise_page.wait_for_heading
-  @front_app.digitise_page.wait_for_search_form
+  @front_app.digitise_page.wait_until_heading_visible
+  @front_app.digitise_page.wait_until_search_form_visible
   expect(@front_app.digitise_page.heading).to have_text("Review licence data")
 
   # Set a licence to work with
@@ -38,9 +38,12 @@ Given(/^I propose changes to a licence$/) do
   expect(@front_app.digitise_review_page.content).to have_text(@ar_licence)
 
   # Edit data on one of three different pages at random
-  # rubocop:disable Metrics/LineLength
-  digitise_sections = [["Edit licence data", "Edit licence"], ["Edit licence holder party", "Edit party"], ["Edit current licence version", "Edit version"]]
-  # rubocop:enable Metrics/LineLength
+  digitise_sections = [
+    ["Edit licence data", "Edit licence"],
+    ["Edit licence holder party", "Edit party"],
+    ["Edit current licence version", "Edit version"]
+  ]
+
   section_number = rand(0..2)
   # Use the link and heading text corresponding to the random number:
   find_link(digitise_sections[section_number][0]).click
@@ -80,7 +83,7 @@ Given(/^I propose changes to a licence$/) do
 
   # Submit the changes you have proposed
   @front_app.digitise_review_page.submit(
-    notes_box: "Automated edit at: " + Time.new.inspect
+    notes_box: "Automated edit at: " + Time.new.inspect, status: "Review"
   )
   expect(@front_app.digitise_page.heading).to have_text("Review licence data")
 
@@ -92,13 +95,14 @@ Given(/^I propose changes to a licence$/) do
 
   @front_app.digitise_page.govuk_banner.sign_out_link.click
   expect(@front_app.sign_out_page.heading).to have_text("You are signed out")
+  find_link("Sign in").click
 end
 
 When(/^I reject the changes$/) do
   # Search for a licence
   find_link("Digitise!").click
-  @front_app.digitise_page.wait_for_heading
-  @front_app.digitise_page.wait_for_search_form
+  @front_app.digitise_page.wait_until_heading_visible
+  @front_app.digitise_page.wait_until_search_form_visible
   @front_app.digitise_page.search(search_form: @ar_licence)
   @front_app.digitise_page.single_result.click
   expect(@front_app.digitise_review_page.content).to have_text(@ar_licence)
@@ -133,8 +137,8 @@ end
 When(/^I mark the licence for review$/) do
   # Search for a licence
   find_link("Digitise!").click
-  @front_app.digitise_page.wait_for_heading
-  @front_app.digitise_page.wait_for_search_form
+  @front_app.digitise_page.wait_until_heading_visible
+  @front_app.digitise_page.wait_until_search_form_visible
   @front_app.digitise_page.search(search_form: @ar_licence)
   @front_app.digitise_page.single_result.click
   expect(@front_app.digitise_review_page.content).to have_text(@ar_licence)

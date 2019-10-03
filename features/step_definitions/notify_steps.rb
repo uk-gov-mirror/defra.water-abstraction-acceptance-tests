@@ -1,7 +1,8 @@
-Given(/^I go to the notifications screen$/) do
+Given(/^I go to the Hands-off flow screen$/) do
   expect(production?).to be false
-  @front_app.licences_page.nav_bar.notifications_link.click
-  expect(@front_app.notify_menu_page.heading).to have_text("Reports and notifications")
+  @front_app.licences_page.nav_bar.manage_link.click
+  expect(@front_app.manage_page.heading).to have_text("Manage reports and notices")
+  @front_app.manage_page.click_hands_off_flow_link
 
   @notify_licences = Quke::Quke.config.custom["data"]["licence_reg_some"].to_s
   @notify_hof_recipient_count = Quke::Quke.config.custom["data"]["notify_hof_recipient_count"].to_s
@@ -10,7 +11,8 @@ Given(/^I go to the notifications screen$/) do
 end
 
 Given(/^I remove my contact information$/) do
-  @front_app.notify_menu_page.govuk_banner.contact_info_link.click
+  @front_app.manage_page.load
+  @front_app.manage_page.govuk_banner.contact_info_link.click
   expect(@front_app.notify_contact_info_page.heading).to have_text("Contact information")
   @front_app.notify_contact_info_page.submit(
     contact_name: "",
@@ -22,7 +24,7 @@ Given(/^I remove my contact information$/) do
 end
 
 Given(/^I am prompted to add my contact details$/) do
-  find_link("Hands off flow: stop or reduce abstraction").click
+  # @front_app.manage_page.click_hands_off_flow_link
   expect(@front_app.notify_add_contact_name_page.heading).to have_text("Add your contact information")
   @front_app.notify_add_contact_name_page.submit(
     contact_name: "Autopopulated name",
@@ -55,24 +57,26 @@ Given(/^I select a template at random$/) do
   # Because the code is the same for each template, we only need to test one per run.
   # The advantage of this is that the test is quicker to run and doesn't
   # clog up Notify with extra messages.
+  @front_app.manage_page.load
+
   r = rand(1..4)
   if r == 1
-    find_link("Hands off flow: levels warning").click
+    @front_app.manage_page.click_restriction_link
     expect(@front_app.notify_add_licences_page.heading).to have_text("Send a hands off flow warning")
     @notification_type = "hands off flow warning"
     @notification_type_long = "Hands off flow: levels warning"
   elsif r == 2
-    find_link("Hands off flow: stop or reduce abstraction").click
+    @front_app.manage_page.click_hands_off_flow_link
     expect(@front_app.notify_add_licences_page.heading).to have_text("Send a hands off flow restriction notice")
     @notification_type = "hands off flow restriction notice"
     @notification_type_long = "Hands off flow: stop or reduce abstraction"
   elsif r == 3
-    find_link("Hands off flow: resume abstraction").click
+    @front_app.manage_page.click_resume_link
     expect(@front_app.notify_add_licences_page.heading).to have_text("Send a hands off flow resume notice")
     @notification_type = "hands off flow resume notice"
     @notification_type_long = "Hands off flow: resume abstraction"
   elsif r == 4
-    find_link("Expiring licence(s): invitation to renew").click
+    @front_app.manage_page.click_renewal_link
     expect(@front_app.notify_add_licences_page.heading).to have_text("Send an invitation to renew")
     @notification_type = "invitation to renew"
     @notification_type_long = "Expiring licence(s): invitation to renew"
@@ -80,7 +84,7 @@ Given(/^I select a template at random$/) do
 end
 
 Given(/^I am on the notification add licences page$/) do
-  @front_app.notify_add_licences_page.wait_for_licence_box
+  @front_app.notify_add_licences_page.wait_until_licence_box_visible
   expect(@front_app.notify_add_licences_page.heading).to have_text(@notification_type.to_s)
   # rubocop:disable Metrics/LineLength
   expect(@front_app.notify_add_licences_page.instructions).to have_text("Enter the licence number(s) you want to send a notification about")
@@ -95,7 +99,7 @@ Given(/^I add licences for a notification$/) do
   # rubocop:disable Metrics/LineLength
   expect(@front_app.notify_confirm_licences_page.instructions).to have_text("You can remove any licences you want to exclude from this notification below.")
   # rubocop:enable Metrics/LineLength
-  @front_app.notify_confirm_licences_page.wait_for_continue_button
+  @front_app.notify_confirm_licences_page.wait_until_continue_button_visible
   expect(@front_app.notify_confirm_licences_page).to have_licence_checkboxes count: @notify_licence_count
   @front_app.notify_confirm_licences_page.continue_button.click
 end
@@ -152,7 +156,7 @@ Given(/^I add custom information$/) do
 end
 
 Given(/^I can see the correct information on the confirm message page$/) do
-  @front_app.notify_confirm_message_page.wait_for_continue_button
+  @front_app.notify_confirm_message_page.wait_until_continue_button_visible
   expect(@front_app.notify_confirm_message_page.number_of_licences).to have_text(@notify_licence_count.to_s)
   if @notification_type == "hands off flow warning"
     expect(@front_app.notify_confirm_message_page.number_of_recipients).to have_text(@notify_hof_recipient_count.to_s)
@@ -205,9 +209,9 @@ end
 
 Given(/^the notifications appear in the log$/) do
   expect(@front_app.notify_report_summary_page.first_notification).to have_text(@notification_type_long)
-  # rubocop:disable Metrics/LineLength
-  expect(@front_app.notify_report_summary_page.first_sender).to have_text(Quke::Quke.config.custom["data"]["accounts"]["internal_user"])
-  # rubocop:enable Metrics/LineLength
+
+  internal_user = config_accounts "internal_user"
+  expect(@front_app.notify_report_summary_page.first_sender).to have_text(internal_user)
 end
 
 Given(/^I can view the details of the latest batch$/) do
@@ -235,12 +239,9 @@ end
 
 Given(/^I leave mandatory fields blank$/) do
   @front_app.notify_custom_info_page.submit(
-    gauging_station: "",
-    hof_threshold: "0 metres cubed per second",
-    contact_details: "",
-    sender_name: "A Tester",
+    sender_name: "",
     sender_role: "Test person",
-    sender_address: "Environment Agency\nDeanery Road\nBristol\nBS1 5AH"
+    sender_address: ""
   )
 end
 
