@@ -63,6 +63,16 @@ def developer_url(key)
   config_urls[:developer][key]
 end
 
+def external_application_url
+  urls = Quke::Quke.config.custom["urls"][config_environment]
+  urls["external_application"]
+end
+
+def internal_application_url
+  urls = Quke::Quke.config.custom["urls"][config_environment]
+  urls["internal_application"]
+end
+
 def config_accounts(key)
   Quke::Quke.config.custom["data"]["accounts"][key]
 end
