@@ -1,10 +1,9 @@
 module Pages
-  module External
+  module Internal
     module Account
       class SignIn < SitePrism::Page
-        url = "#{external_application_url}signin"
+        url = "#{internal_application_url}signin"
         set_url(url)
-
         element(:email, "#email")
         element(:password, "#password")
         element(:error_heading, ".govuk-error-summary__list")
@@ -15,6 +14,7 @@ module Pages
         def submit(args = {})
           email.set(args[:email]) if args.key?(:email)
           password.set(args[:password]) if args.key?(:password)
+          puts "Logged in as: " + args[:email] + " user on " + config_environment + " env: " + url
           submit_button.click
         end
 
