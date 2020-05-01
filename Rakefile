@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
 require "rubocop/rake_task"
+require "quke"
+
+load "quke/Rakefile"
 
 RuboCop::RakeTask.new
 
 task default: :run
+
 
 # Remember to create an environment variable in Travis (can be set to anything)!
 if ENV["TRAVIS"]
