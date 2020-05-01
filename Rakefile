@@ -2,6 +2,7 @@
 
 require "rubocop/rake_task"
 require "quke"
+require 'webdrivers'
 
 load "quke/Rakefile"
 
