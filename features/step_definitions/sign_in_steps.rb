@@ -7,7 +7,7 @@ Given(/^I am on the sign in page for "([^"]*)"$/) do |account|
   @user_type = account
   @front_app = FrontOfficeApp.new
 
-  puts "Loading #{@front_app.sign_in_page.current_url}"
+  puts "Loading sign in page at: #{@front_app.sign_in_page.url}"
   @front_app.sign_in_page.load
 
   back_office_internal_url = internal_url(:sign_in)
