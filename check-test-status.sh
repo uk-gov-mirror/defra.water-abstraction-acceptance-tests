@@ -9,4 +9,5 @@ then
   echo "Tests all passed"
 else
   echo "Tests have failed"
+  exit 1;
 fi
