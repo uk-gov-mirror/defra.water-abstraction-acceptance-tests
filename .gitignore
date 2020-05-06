@@ -48,3 +48,4 @@ output.html
 *.config.local.yml
 *.config-bs*
 *.config-jenkins*
+test-results.txt
