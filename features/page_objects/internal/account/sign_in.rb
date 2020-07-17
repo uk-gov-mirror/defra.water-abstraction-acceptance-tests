@@ -12,7 +12,9 @@ module Pages
         element(:create_account_link, "br+ a")
 
         def submit(args = {})
+          email.set("")
           email.set(args[:email]) if args.key?(:email)
+          password.set("")
           password.set(args[:password]) if args.key?(:password)
           puts "Logged in as: " + args[:email] + " user on " + config_environment + " env: " + url
           submit_button.click

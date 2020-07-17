@@ -1,4 +1,4 @@
-@use-internal-test-data @billing
+#@use-internal-test-data @billing
 Feature: Create and View bill runs
   As a Billing and Data user
   I want to be able to trigger and view bill runs for my region so that
@@ -34,3 +34,97 @@ Feature: Create and View bill runs
       | wirs |
       | nps  |
       | psc  |
+
+  @use-internal-test-data
+  Scenario Outline: remove a supplementary bill run ans send bill run
+    Given I logged in as <user> user
+    And I navigate to the "Manage" section
+    When I trigger a "Supplementary" bill run for <region> region
+    Then I click on view link of a bill
+    And I click on Remove from bill run button
+    Then I can see the "remove this bill"
+    And I click on Remove bill button
+    Then I click on view link of a bill
+    And I click on Remove from bill run button
+    Then I can see the "remove this bill"
+    And I click on Remove bill button
+    Then I click on view link of a bill
+    And I click on Remove from bill run button
+    Then I can see the "remove this bill"
+    And I click on Remove bill button
+    And I click on Confirm bill run button
+    Then I can see the "send this bill run"
+    And I click on Send bill run button
+    Then I can see the "Supplementary bill run"
+
+    Examples:
+      | user             | region     |
+      | billing_and_data | Anglian    |
+
+#
+#  @use-internal-test-data
+#  Scenario Outline: Review Two-part tariff bill run
+#    Given I logged in as <user> user
+#    And I navigate to the "Manage" section
+#    When I trigger a "Two-part tariff" bill run for <region> region
+#    Then I can see the "Review licences"
+#    Then I click on Review link of a bill
+#    And I click change on Review returns data issues
+#    And I select the "authorised" billable quantity for this bill run
+#    Then I click on Continue button
+#    And I click on Continue button
+#    Then I can see the "Review licences"
+#    Examples:
+#      | user             | region     |
+#      | billing_and_data | Wales      |
+#
+#
+#  @use-internal-test-data
+#  Scenario Outline: Review Two-part tariff bill run with custom billable quantity
+#    Given I logged in as <user> user
+#    And I navigate to the "Manage" section
+#    When I trigger a "Two-part tariff" bill run for <region> region
+#    Then I can see the "Review licences"
+#    Then I click on Review link of a bill
+#    And I click change on Review returns data issues
+#    And I select the "custom" billable quantity for this bill run
+#    Then I click on Continue button
+#    And I click on Continue button
+#    Then I can see the "Review licences"
+#    Examples:
+#      | user             | region     |
+#      | billing_and_data | Wales      |
+
+  @use-internal-test-data
+  Scenario Outline: Remove Two-part tariff bill runs
+    Given I logged in as <user> user
+    And I navigate to the "Manage" section
+    When I trigger a "Two-part tariff" bill run for <region> region
+    Then I can see the "Review licences"
+    And I remove 92 bill runs
+    Then I can see the "Review licences"
+    Then I click on Review link of a bill
+    And I click change on Review returns data issues
+    And I select the "authorised" billable quantity for this bill run
+    Then I click on Continue button
+    And I click on Continue button
+    Then I can see the "Review licences"
+    Then I click on Review link of a bill
+    And I click change on Review returns data issues
+    And I select the "custom" billable quantity for this bill run
+    Then I click on Continue button
+    And I click on Continue button
+    Then I can see the "Review licences"
+    And I click on Continue1 button
+    Then I click on Confirm button
+    And I click on Confirm bill run button
+    Then I can see the "send this bill run"
+    And I click on Send bill run button
+    Then I can see the "Two-part tariff bill run"
+
+
+
+
+    Examples:
+      | user             | region     |
+      | billing_and_data | Wales      |
