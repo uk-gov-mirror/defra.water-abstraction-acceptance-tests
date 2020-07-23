@@ -41,15 +41,15 @@ module Pages
         find_link("Confirm bill run").click
       end
 
-      def clickContinueButton()
+      def click_continue_button
         continue_button.click
       end
 
-      def clickContinue1Button()
+      def click_continue1_button
         find_link("Continue").click
       end
 
-      def clickConfirmButton()
+      def click_confirm_button
         confirm_button.click
       end
 

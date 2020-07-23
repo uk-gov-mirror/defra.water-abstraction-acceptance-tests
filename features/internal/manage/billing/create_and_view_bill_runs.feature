@@ -1,4 +1,4 @@
-#@use-internal-test-data @billing
+@use-internal-test-data @billing
 Feature: Create and View bill runs
   As a Billing and Data user
   I want to be able to trigger and view bill runs for my region so that

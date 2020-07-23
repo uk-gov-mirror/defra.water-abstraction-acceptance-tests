@@ -10,10 +10,9 @@ module Pages
 
         element(:view_bill_link, :xpath, "//table/tbody/tr[1]/td[6]/a[1]")
 
-        def viewBill()
+        def view_bill
           view_bill_link.click
         end
-
       end
     end
   end

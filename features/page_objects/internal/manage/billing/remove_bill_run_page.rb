@@ -10,7 +10,7 @@ module Pages
           current_page_url
         end
 
-        def click_remove_bill_run()
+        def click_remove_bill_run
           remove_link.click
         end
 
@@ -18,4 +18,3 @@ module Pages
     end
   end
 end
-

@@ -16,7 +16,7 @@ module Pages
         element(:remove_license_button, "form button.govuk-button")
         # element(:confirm_button, :xpath, "//*[@id=main-content]/div/div/div[2]/div/form/button")
 
-        def clickReview()
+        def click_review
           review_link.click
         end
 
@@ -24,7 +24,7 @@ module Pages
         #   confirm_button.click
         # end
 
-        def clickChange()
+        def click_change
           change_link.click
         end
 
@@ -32,30 +32,26 @@ module Pages
           find_link("Remove from bill run").click
         end
 
-        def setTheBillableQuantity(billable_quantity_type)
-          if (billable_quantity_type == "authorised")
-            authorised_radio.click
-          end
-          if (billable_quantity_type == "custom")
-            custom_radio.click
-            custom_quantity.set("0.2")
-          end
+        def the_billable_quantity(billable_quantity_type)
+          authorised_radio.click if billable_quantity_type == "authorised"
+          return unless billable_quantity_type == "custom"
+          custom_radio.click
+          custom_quantity.set("0.2")
         end
 
-        def removeBillRuns(bill_runs_count)
-          $i = 0
-          $num = bill_runs_count
+        def remove_bill_runs(bill_runs_count)
+          @i = 0
+          @num = bill_runs_count
 
-          while $i < $num  do
-            puts("Inside the loop i = #$i" )
-            clickReview
+          while @i < @num
+            puts("Inside the loop i = #{@i}")
+            click_review
             click_remove_bill_link
             remove_license_button.click
-            $i +=1
+            @i += 1
           end
-        end
-
         end
       end
     end
   end
+end

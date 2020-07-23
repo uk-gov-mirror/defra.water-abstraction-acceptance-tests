@@ -41,7 +41,7 @@ end
 
 Then("I click on view link of a bill") do
   @batch_list_page = Pages::Internal::Manage::BillRunBatchListPage.new
-  @batch_list_page.viewBill
+  @batch_list_page.view_bill
 end
 
 Then("I click on Remove from bill run button") do
@@ -53,7 +53,7 @@ Then("I click on Confirm bill run button") do
 end
 
 Then("I click on Confirm button") do
-  @page.clickConfirmButton
+  @page.click_confirm_button
   sleep 50
 end
 
@@ -69,28 +69,28 @@ end
 
 Then("I click on Review link of a bill") do
   @two_part_tariff_review_page = Pages::Internal::Manage::TwoPartTariffReviewPage.new
-  @two_part_tariff_review_page.clickReview
+  @two_part_tariff_review_page.click_review
 end
 
 Then("I click change on Review returns data issues") do
   @two_part_tariff_review_page = Pages::Internal::Manage::TwoPartTariffReviewPage.new
-  @two_part_tariff_review_page.clickChange
+  @two_part_tariff_review_page.click_change
 end
 
 Then("I select the {string} billable quantity for this bill run") do |billable_quantity_type|
   @two_part_tariff_review_page = Pages::Internal::Manage::TwoPartTariffReviewPage.new
-  @two_part_tariff_review_page.setTheBillableQuantity(billable_quantity_type)
+  @two_part_tariff_review_page.the_billable_quantity(billable_quantity_type)
 end
 
 Then("I click on Continue button") do
-  @page.clickContinueButton
+  @page.click_continue_button
 end
 
 Then("I click on Continue1 button") do
-  @page.clickContinue1Button
+  @page.click_continue1_button
 end
 
 Then("I remove {int} bill runs") do |bill_runs_count|
   @two_part_tariff_review_page = Pages::Internal::Manage::TwoPartTariffReviewPage.new
-  @two_part_tariff_review_page.removeBillRuns(bill_runs_count)
+  @two_part_tariff_review_page.remove_bill_runs(bill_runs_count)
 end
