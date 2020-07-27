@@ -15,6 +15,7 @@ module Pages
         def submit_bill_run_type(bill_run_type)
           submit_two_part_tariff_bill_run_type(bill_run_type) if bill_run_type == "Two-part tariff"
           return nil unless bill_run_type == "Supplementary"
+
           # type = page.find("#selectedBillingType-2", visible: false).value
           # return unless type.casecmp(bill_run_type).zero?
           supp_bill_run_type.click

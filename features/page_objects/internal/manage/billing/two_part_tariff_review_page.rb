@@ -35,6 +35,7 @@ module Pages
         def the_billable_quantity(billable_quantity_type)
           authorised_radio.click if billable_quantity_type == "authorised"
           return unless billable_quantity_type == "custom"
+
           custom_radio.click
           custom_quantity.set("0.2")
         end
