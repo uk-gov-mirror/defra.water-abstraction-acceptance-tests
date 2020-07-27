@@ -1,4 +1,4 @@
-@use-internal-test-data @notifications
+#@use-internal-test-data @notifications
 Feature: Internal user is able to send paper forms
 
   As an internal user

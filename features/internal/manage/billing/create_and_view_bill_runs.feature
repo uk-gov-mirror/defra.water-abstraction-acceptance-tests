@@ -1,4 +1,4 @@
-@use-internal-test-data @billing
+#@use-internal-test-data @billing
 Feature: Create and View bill runs
   As a Billing and Data user
   I want to be able to trigger and view bill runs for my region so that
@@ -35,7 +35,7 @@ Feature: Create and View bill runs
       | nps  |
       | psc  |
 
-  @use-internal-test-data
+  @use-internal-test-data @billing
   Scenario Outline: remove a supplementary bill run ans send bill run
     Given I logged in as <user> user
     And I navigate to the "Manage" section
@@ -95,7 +95,7 @@ Feature: Create and View bill runs
 #      | user             | region     |
 #      | billing_and_data | Wales      |
 
-  @use-internal-test-data
+  @use-internal-test-data @billing
   Scenario Outline: Remove Two-part tariff bill runs
     Given I logged in as <user> user
     And I navigate to the "Manage" section
