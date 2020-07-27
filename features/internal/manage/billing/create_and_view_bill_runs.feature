@@ -121,6 +121,10 @@ Feature: Create and View bill runs
     Then I can see the "send this bill run"
     And I click on Send bill run button
     Then I can see the "Two-part tariff bill run"
+#    And I navigate to the "Manage" section
+#    Then I select the past and open bill runs option
+#    Then I can see the "bill runs"
+
 
 
 
