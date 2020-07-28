@@ -45,7 +45,7 @@ Feature: Reset test environment
     * I am on the external abstraction licences page
     * I revoke access to view my licences
 
-    * I am on the sign in page for "internal_user"
+    * I am on the sign in page for "internal_usera"
     * I sign into my account as "ar_approver"
     * I reset a licence back to in progress
 

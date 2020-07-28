@@ -1,4 +1,4 @@
-@use-internal-test-data @notifications
+#@use-internal-test-data @notifications
 Feature: Internal user is able to send returns invitations
 
   As an internal user

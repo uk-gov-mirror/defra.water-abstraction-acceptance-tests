@@ -18,6 +18,7 @@ module Pages
             end
           end
           continue_button.click
+          sleep 60
         end
       end
     end

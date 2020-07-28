@@ -2,14 +2,13 @@
 
 require "rubocop/rake_task"
 require "quke"
-require 'webdrivers'
+require "webdrivers"
 
 load "quke/Rakefile"
 
 RuboCop::RakeTask.new
 
 task default: :run
-
 
 # Remember to create an environment variable in Travis (can be set to anything)!
 if ENV["TRAVIS"]

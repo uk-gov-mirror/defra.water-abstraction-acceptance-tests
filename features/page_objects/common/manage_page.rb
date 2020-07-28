@@ -22,4 +22,5 @@ class ManagePage < SitePrism::Page
   def click_restriction_link
     find_link("Restriction").click
   end
+
 end

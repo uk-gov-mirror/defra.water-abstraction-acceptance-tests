@@ -8,7 +8,7 @@ AllCops:
   # investigating what the fix may be.
   DisplayStyleGuide: true
   # Add target ruby version to check against:
-  TargetRubyVersion: 2.3.0
+  TargetRubyVersion: 2.8.0
 
 # When using Ruby >= 2.3, Rubocop wants to add a comment to the top of *.rb
 # to aid migration to frozen literals in Ruby 3.0. We are not interested in
