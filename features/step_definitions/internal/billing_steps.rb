@@ -94,3 +94,13 @@ Then("I remove {int} bill runs") do |bill_runs_count|
   @two_part_tariff_review_page = Pages::Internal::Manage::TwoPartTariffReviewPage.new
   @two_part_tariff_review_page.remove_bill_runs(bill_runs_count)
 end
+
+When(/^I trigger a bill run$/) do
+  @page.create_a_bill_run
+  @bill_run_page = Pages::Internal::Manage::BillRunTypePage.new
+  expect(@bill_run_page.current_url).to include("/billing/batch/type")
+end
+
+Then("I should be on the page {string}") do |page|
+  expect(@page.h1_heading.text).to have_text(page)
+end
