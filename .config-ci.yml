@@ -19,9 +19,13 @@ custom:
       back_office: "https://example.com"
       external_application: "https://example.com"
     dev:
-      front_office: "https://example.com"
-      external_application: "https://example.com"
-      back_office: "https://example.com"
+      front_office: "https://wal-dev.aws.defra.cloud/welcome"
+      front_office_sign_in: "https://wal-dev.aws.defra.cloud/signin"
+      external_application: "https://wal-dev.aws.defra.cloud/"
+      internal_application: "https://wal-admin-dev.aws.defra.cloud/"
+      root_url: "https://wal-dev.aws.defra.cloud/"
+      back_office_root: "https://wal-admin-dev.aws.defra.cloud/admin/"
+      back_office_login: "https://andrew.hick@environment-agency.gov.uk:Bag0nail$@wal-admin-dev.aws.defra.cloud/admin/"
     sand:
       front_office: "https://example.com"
       back_office: "https://example.com"

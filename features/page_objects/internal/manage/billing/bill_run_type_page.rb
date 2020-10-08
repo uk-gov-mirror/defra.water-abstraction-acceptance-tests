@@ -11,6 +11,7 @@ module Pages
         element(:supp_bill_run_type, "#selectedBillingType-2", visible: false)
         element(:two_part_tariff__bill_run_type, "#selectedBillingType-3", visible: false)
         element(:two_part_tariff_season_type, "#twoPartTariffSeason", visible: false)
+        element(:two_part_tariff_season_type_winter, "#twoPartTariffSeason-2", visible: false)
 
         def submit_bill_run_type(bill_run_type)
           submit_two_part_tariff_bill_run_type(bill_run_type) if bill_run_type == "Two-part tariff"
@@ -26,6 +27,15 @@ module Pages
           two_part_tariff__bill_run_type.click
           two_part_tariff_season_type.click
           continue_button.click
+        end
+
+        def click_bill_run(bill_run_type)
+          two_part_tariff__bill_run_type.click if bill_run_type == "Two-part tariff"
+          return nil unless bill_run_type == "Supplementary"
+        end
+
+        def click_two_part_tariff_season(season_type)
+          two_part_tariff_season_type_winter.click if season_type == "winter"
         end
 
       end

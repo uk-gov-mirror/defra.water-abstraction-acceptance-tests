@@ -88,6 +88,7 @@ Feature: Create and View bill runs
 #    Then I click on Review link of a bill
 #    And I click change on Review returns data issues
 #    And I select the "custom" billable quantity for this bill run
+#    When I enter the billable quantity as "0.2"
 #    Then I click on Continue button
 #    And I click on Continue button
 #    Then I can see the "Review licences"

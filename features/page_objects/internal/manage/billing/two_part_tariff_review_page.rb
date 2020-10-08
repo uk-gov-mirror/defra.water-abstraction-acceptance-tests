@@ -37,7 +37,11 @@ module Pages
           return unless billable_quantity_type == "custom"
 
           custom_radio.click
-          custom_quantity.set("0.2")
+          #custom_quantity.set("0.2")
+        end
+
+        def set_custom_quantity(quantity)
+          custom_quantity.set(quantity)
         end
 
         def remove_bill_runs(bill_runs_count)

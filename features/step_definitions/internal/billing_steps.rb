@@ -104,3 +104,27 @@ end
 Then("I should be on the page {string}") do |page|
   expect(@page.h1_heading.text).to have_text(page)
 end
+
+And("I should see the error message {string}") do |message|
+  expect(@page.error_link.text).to have_text(message)
+end
+
+When(/^I select a "([^"]*)" bill run$/) do |bill_run_type|
+  @bill_run_page = Pages::Internal::Manage::BillRunTypePage.new
+  @bill_run_page.click_bill_run(bill_run_type)
+end
+
+When(/^I select two part tariff season "([^"]*)"$/) do |season_type|
+  @bill_run_page = Pages::Internal::Manage::BillRunTypePage.new
+  @bill_run_page.click_two_part_tariff_season(season_type)
+end
+
+When(/^I select a "([^"]*)" region$/) do |region|
+  @region_type = Pages::Internal::Manage::SelectTheRegionPage.new
+  @region_type.submit_region_type(region)
+end
+
+When(/^I enter the billable quantity as "([^"]*)"$/) do |quantity|
+  @two_part_tariff_review_page = Pages::Internal::Manage::TwoPartTariffReviewPage.new
+  @two_part_tariff_review_page.set_custom_quantity(quantity)
+end
