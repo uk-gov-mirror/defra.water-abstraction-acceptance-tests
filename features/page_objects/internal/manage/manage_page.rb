@@ -4,6 +4,7 @@ module Pages
 
       element(:continue_button, "form button.govuk-button")
       element(:confirm_button, "form button.govuk-button")
+      element(:back_link, "a.govuk-back-link")
 
       def initialize
         current_page_url
@@ -51,6 +52,10 @@ module Pages
 
       def click_confirm_button
         confirm_button.click
+      end
+
+      def click_back_link
+        find_link("Back").click
       end
 
     end

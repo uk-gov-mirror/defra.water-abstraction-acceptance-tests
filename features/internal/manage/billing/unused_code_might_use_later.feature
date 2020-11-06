@@ -13,7 +13,7 @@ Feature: Create and View bill runs
     Examples:
       | user             | region     |
       | billing_and_data | Test Region|
-      #| super            | South West |
+      | super            | South West |
 
   Scenario Outline: [WATER-2386] View past and open bill runs
     Given I logged in as <user> user
