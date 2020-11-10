@@ -9,7 +9,10 @@ class TestData
   def create(include_internal = false)
     url = create_url "set-up"
     puts "Set up request to #{url}, include_internal=#{include_internal}"
-    response = HTTParty.post(url, body: { includeInternalUsers: include_internal })
+    response = HTTParty.post(url, body: { includeInternalUsers: include_internal,
+                                          includeCharging: true,
+                                          includeAnnualBillRun: true,
+                                          includeSupplementaryBillRun: true })
     @response_data = response.parsed_response
 
     raise "Could not create test data" unless response.code == 200

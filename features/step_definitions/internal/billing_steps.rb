@@ -14,7 +14,7 @@ end
 Then("I can see the {string}") do |bill_action_type|
   if bill_action_type.eql? "bill run started"
     page = Pages::Internal::Manage::BillRunConfirmationPage.new
-    expect(page.h1_heading).to have_text("Bill run exist")
+    expect(page.h1_heading).to have_text("supplementary bills")
   elsif bill_action_type.eql? "bill runs"
     @batch_list_page = Pages::Internal::Manage::BillRunBatchListPage.new
     expect(@batch_list_page).to have_text("Create a bill run")
@@ -27,6 +27,9 @@ Then("I can see the {string}") do |bill_action_type|
   elsif bill_action_type.eql? "Supplementary bill run"
     @batch_list_page = Pages::Internal::Manage::BillRunBatchListPage.new
     expect(@batch_list_page).to have_text("Supplementary bill run")
+  elsif bill_action_type.eql? "Annual bill run"
+    @batch_list_page = Pages::Internal::Manage::BillRunBatchListPage.new
+    expect(@batch_list_page).to have_text("Annual bill run")
   elsif bill_action_type.eql? "Review licences"
     @two_part_tariff_review_page = Pages::Internal::Manage::TwoPartTariffReviewPage.new
     expect(@two_part_tariff_review_page).to have_text("Review licences with returns data issues")
@@ -44,8 +47,22 @@ Then("I click on view link of a bill") do
   @batch_list_page.view_bill
 end
 
+Then("I click on Other abstractors tab") do
+  @annual_page = Pages::Internal::Manage::AnnualBillPage.new
+  @annual_page.click_other_abstrators_tab
+end
+
+Then("I click on view link of an Annual bill") do
+  @annual_page = Pages::Internal::Manage::AnnualBillPage.new
+  @annual_page.click_view_link
+end
+
 Then("I click on Remove from bill run button") do
   @page.click_remove_bill_link
+end
+
+Then("I click on back link") do
+  @page.click_back_link
 end
 
 Then("I click on Confirm bill run button") do

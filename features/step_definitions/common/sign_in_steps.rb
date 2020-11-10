@@ -8,6 +8,7 @@ Given("I log in at the external test user") do
 end
 
 Given(/^I logged in as ([^"]*) user$/) do |user|
+  # system("bash ./create-test-data.sh")
   log_in_as_user(user)
 end
 
