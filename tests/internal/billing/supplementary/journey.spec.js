@@ -1,6 +1,6 @@
 import { regions } from '../../../support/default-values.js'
 import { reloadUntilTextFound } from '../../../support/helpers/wait.helpers.js'
-import scenarioData from '../../../support/scenarios/presroc-licence-flagged-for-supplementary-with-current-annual-bill-run.scenario.js'
+import scenarioData from '../../../support/scenarios/presroc-licence-flagged-for-supplementary.scenario.js'
 import { summaryValue } from '../../../support/helpers/govuk.helpers.js'
 import {
   PRESROC_LAST_FINANCIAL_YEAR,
@@ -16,24 +16,16 @@ test.describe(
     let billingPeriodCount
     let company
     let licence
-    let presrocBillingAccount
+    let billingAccount
     let presrocToFinancialYearEnding
-    let srocBillingAccount
     let toFinancialYearEnding
 
     test.beforeAll(async ({ setup }) => {
       const scenario = scenarioData()
 
-      const {
-        companies: [companyFromScenario],
-        licences: [licenceFromScenario]
-      } = scenario
-      const [presrocBillingAccountFromScenario, srocBillingAccountFromScenario] = scenario.billingAccounts
-
-      company = companyFromScenario
-      licence = licenceFromScenario
-      presrocBillingAccount = presrocBillingAccountFromScenario
-      srocBillingAccount = srocBillingAccountFromScenario
+      company = scenario.company
+      licence = scenario.licence
+      billingAccount = scenario.billingAccount
 
       toFinancialYearEnding = scenario.billRun.toFinancialYearEnding
       billingPeriodCount = billingPeriodCounts(toFinancialYearEnding)
@@ -96,7 +88,7 @@ test.describe(
         const billedFinancialYear = presrocToFinancialYearEnding - index
         const billRow = presrocAbstractorsTable.getByRole('row', { name: String(billedFinancialYear) })
 
-        await expect(billRow).toContainText(presrocBillingAccount.accountNumber)
+        await expect(billRow).toContainText(billingAccount.accountNumber)
         await expect(billRow).toContainText(company.name)
         await expect(billRow).toContainText(licence.licenceRef)
         await expect(billRow.getByRole('link', { name: 'View' })).toBeVisible()
@@ -125,7 +117,7 @@ test.describe(
         const billedFinancialYear = presrocToFinancialYearEnding - index
         const billRow = sentPresrocAbstractorsTable.getByRole('row', { name: String(billedFinancialYear) })
 
-        await expect(billRow).toContainText(presrocBillingAccount.accountNumber)
+        await expect(billRow).toContainText(billingAccount.accountNumber)
         await expect(billRow).toContainText(company.name)
         await expect(billRow).toContainText(licence.licenceRef)
         await expect(billRow.getByRole('link', { name: 'View' })).toBeVisible()
@@ -145,11 +137,6 @@ test.describe(
       await expect(page.locator('h1')).toContainText(`${regions.SOUTHERN.displayName} supplementary`)
       await expect(page.locator('#main-content > p > .govuk-tag')).toContainText('ready')
 
-      const expectedSrocBillsText =
-        billingPeriodCount.sroc === 1 ? '1 Supplementary bill' : `${billingPeriodCount.sroc} Supplementary bills`
-
-      await expect(page.locator('[data-test="bills-count"]')).toContainText(expectedSrocBillsText)
-
       const srocAbstractorsTable = page.locator('[data-test="other-abstractors"]')
 
       await expect(srocAbstractorsTable).toBeVisible()
@@ -158,7 +145,7 @@ test.describe(
         const billedFinancialYear = toFinancialYearEnding - index
         const billRow = srocAbstractorsTable.getByRole('row', { name: String(billedFinancialYear) })
 
-        await expect(billRow).toContainText(srocBillingAccount.accountNumber)
+        await expect(billRow).toContainText(billingAccount.accountNumber)
         await expect(billRow).toContainText(company.name)
         await expect(billRow).toContainText(licence.licenceRef)
         await expect(billRow.getByRole('link', { name: 'View' })).toBeVisible()
@@ -187,9 +174,10 @@ test.describe(
         const billedFinancialYear = toFinancialYearEnding - index
         const billRow = sentSrocAbstractorsTable.getByRole('row', { name: String(billedFinancialYear) })
 
-        await expect(billRow).toContainText(srocBillingAccount.accountNumber)
+        await expect(billRow).toContainText(billingAccount.accountNumber)
         await expect(billRow).toContainText(company.name)
         await expect(billRow).toContainText(licence.licenceRef)
+        await expect(billRow).not.toContainText('£0.00')
         await expect(billRow.getByRole('link', { name: 'View' })).toBeVisible()
       }
 

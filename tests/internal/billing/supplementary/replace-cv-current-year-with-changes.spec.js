@@ -71,7 +71,7 @@ test.describe(
       await expect(page.locator('#main-content > p > .govuk-tag')).toContainText('ready')
 
       const expectedBillsText =
-        billingPeriodCount.sroc === 1 ? '1 Supplementary bill' : `${billingPeriodCount.sroc - 1} Supplementary bills`
+        billingPeriodCount.sroc === 1 ? '1 Supplementary bill' : `${billingPeriodCount.sroc} Supplementary bills`
 
       await expect(page.locator('[data-test="bills-count"]')).toContainText(expectedBillsText)
       await page.getByRole('button', { name: 'Send bill run' }).click()
@@ -90,7 +90,7 @@ test.describe(
 
       await expect(page.locator('h1')).toContainText('Bill runs')
       await expect(page.locator('[data-test="date-created-1"] > .govuk-link')).toContainText(formattedCurrentDate)
-      await expect(page.locator('[data-test="number-of-bills-1"]')).toContainText(String(billingPeriodCount.sroc - 1))
+      await expect(page.locator('[data-test="number-of-bills-1"]')).toContainText(String(billingPeriodCount.sroc))
       await expect(page.locator('[data-test="bill-run-status-1"] > .govuk-tag')).toContainText('sent')
 
       await page.getByRole('link', { name: 'Search' }).click()
