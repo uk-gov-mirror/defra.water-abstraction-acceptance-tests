@@ -52,7 +52,7 @@ function _billRunEntity(licenceEntity, billingAccountEntity, chargeVersionEntity
   billRun.fromFinancialYearEnding = new Date(dates.endDate).getUTCFullYear()
   billRun.toFinancialYearEnding = new Date(dates.endDate).getUTCFullYear()
 
-  const bill = billData(billingAccount, billRun)
+  const bill = billData(billingAccount, billRun, region)
   const billLicence = billLicenceData(bill, licence)
 
   const transactions = [transactionData(billLicence, chargeReference, dates)]

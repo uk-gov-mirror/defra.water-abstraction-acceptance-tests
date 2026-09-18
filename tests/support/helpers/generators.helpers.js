@@ -51,6 +51,27 @@ export function generateBillRunNumber(region = null) {
 }
 
 /**
+ * Generates an Invoice number
+ *
+ * The invoice number is in the format '[charge region id]AI#######T'. Real invoice numbers are returned by the
+ * Charging Module when a bill run is sent - we don't call that service, so we generate our own that looks the same,
+ * e.g. 'SAI0001234T'.
+ *
+ * @param {object} region - the region the invoice number's charge region id prefix is generated for
+ *
+ * @returns {string} - An invoice number
+ */
+export function generateInvoiceNumber(region = null) {
+  if (!region) {
+    region = RegionHelper.select(RegionHelper.TEST_REGION_INDEX)
+  }
+
+  const sequence = generateRandomInteger(1, 9999999).toString().padStart(7, '0')
+
+  return `${region.chargeRegionId}AI${sequence}T`
+}
+
+/**
  * Generate a company email address
  *
  * @param {string} companyName - The name of the company (e.g., "Hamill & Jones")
