@@ -1,15 +1,17 @@
-import buildBillRunEntity from '../entities/bill-run.entity.js'
+import buildBillRunEntities from '../entities/bill-runs.entities.js'
 import buildBillingAccountEntity from '../entities/billing-account.entity.js'
 import buildChargeVersionEntity from '../entities/charge-version.entity.js'
 import buildLicenceEntity from '../entities/licence.entity.js'
 import { calculatedDates } from '../helpers/calculated-dates.helpers.js'
+import { markAsTwoPartTariff } from '../helpers/billing.helpers.js'
+import { mergeByKey } from '../helpers/scenario.helpers.js'
 import { regions } from '../default-values.js'
 import workflowData from '../data/workflow.data.js'
 import { yesterday } from '../helpers/date.helpers.js'
 
-export const title = 'Licence in workflow, and an annual bill run'
+export const title = 'Licence in workflow, and two-part tariff bill runs'
 export const description =
-  'Licence in workflow, and a sent annual bill run, with the workflow entry created before the bill run so it can test supp. flagging behaviour'
+  "Licence in workflow, and a sent two-part tariff bill run, with the workflow entry created before the bill run's end date so it can test supp. flagging behaviour"
 
 /**
  * For a bill run to exist, there needs to be a charge version.
@@ -18,37 +20,41 @@ export const description =
  */
 export default function (region = null) {
   if (!region) {
-    region = regions.NORTH_EAST
+    region = regions.NORTH_WEST
   }
+
+  const licenceEntity = buildLicenceEntity(region)
 
   const {
     billingPeriods: {
-      annual: [annualDates]
+      twoPartTariff: [twoPartTariffDates]
     }
   } = calculatedDates()
 
-  const licenceEntity = buildLicenceEntity(region)
   const billingAccountEntity = buildBillingAccountEntity(licenceEntity, region)
   const chargeVersionEntity = buildChargeVersionEntity(licenceEntity, billingAccountEntity, region)
-  const billRunEntity = buildBillRunEntity(
+  const billRunEntities = buildBillRunEntities(
     licenceEntity,
     billingAccountEntity,
     chargeVersionEntity,
-    annualDates,
+    twoPartTariffDates,
     region
   )
+
+  markAsTwoPartTariff(billRunEntities)
 
   const workflow = workflowData(licenceEntity.licence)
 
   // The workflow createdAt date is used to show the supplementary billing flag.
-  workflow.createdAt = yesterday()
+  // It should be set to a date before the two-part tariff bill run's end date.
+  workflow.createdAt = `${new Date(twoPartTariffDates.endDate).getUTCFullYear()}-01-01`
   workflow.updatedAt = yesterday()
 
   return {
     ...licenceEntity,
     ...billingAccountEntity,
     ...chargeVersionEntity,
-    ...billRunEntity,
+    ...mergeByKey(...billRunEntities),
     workflow
   }
 }

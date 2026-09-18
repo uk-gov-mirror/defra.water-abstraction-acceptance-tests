@@ -1,4 +1,4 @@
-import scenarioData from '../../support/scenarios/licence-with-agreement-and-bill-run.scenario.js'
+import scenarioData from '../../support/scenarios/licence-with-tpt-agreement-and-bill-runs.scenario.js'
 import { expect, test } from '../../support/fixtures.js'
 
 test.describe(
@@ -19,7 +19,7 @@ test.describe(
       const scenario = scenarioData()
 
       licence = scenario.licence
-      billRun = scenario.billRun
+      billRun = scenario.billRuns[0]
 
       await setup(scenario)
     })

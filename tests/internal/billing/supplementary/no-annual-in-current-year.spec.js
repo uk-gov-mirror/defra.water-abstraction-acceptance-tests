@@ -1,7 +1,7 @@
 import { formatLongDate } from '../../../support/helpers/date.helpers.js'
 import { regions } from '../../../support/default-values.js'
 import { reloadUntilTextFound } from '../../../support/helpers/wait.helpers.js'
-import scenarioData from '../../../support/scenarios/licence-flagged-for-supplementary-with-previous-annual-bill-run.scenario.js'
+import scenarioData from '../../../support/scenarios/licence-flagged-for-supplementary-with-no-current-annual-bill-run.scenario.js'
 import { expect, test } from '../../../support/fixtures.js'
 
 test.describe(
@@ -21,7 +21,7 @@ test.describe(
       licence = scenario.licence
 
       // The supplementary engine bases its calculation on the seeded annual bill run's own year, not the current one
-      toFinancialYearEnding = scenario.billRun.toFinancialYearEnding
+      toFinancialYearEnding = scenario.billRuns[0].toFinancialYearEnding
 
       await setup(scenario)
     })

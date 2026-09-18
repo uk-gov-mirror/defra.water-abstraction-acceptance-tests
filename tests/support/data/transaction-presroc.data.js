@@ -12,15 +12,19 @@ export default function (billLicence, chargeReference, dates) {
     chargeType: 'standard',
     startDate: dates.startDate,
     endDate: dates.endDate,
+    // A presroc (alcs scheme) transaction must have an abstraction period — unlike sroc, the DB check constraint
+    // doesn't waive this for the alcs scheme
+    abstractionPeriod: {
+      startDay: chargeReference.abstractionPeriodStartDay,
+      startMonth: chargeReference.abstractionPeriodStartMonth,
+      endDay: chargeReference.abstractionPeriodEndDay,
+      endMonth: chargeReference.abstractionPeriodEndMonth
+    },
     source: chargeReference.source,
     loss: chargeReference.loss,
-    volume: chargeReference.volume,
     scheme: chargeReference.scheme,
     section127Agreement: chargeReference.section127Agreement,
-    section130Agreement: 'false',
     description: chargeReference.description,
-    chargeCategoryCode: chargeReference.chargeCategoryId.value,
-    chargeCategoryDescription: 'Test charge category',
     purposes: [{}],
     netAmount,
     credit: false

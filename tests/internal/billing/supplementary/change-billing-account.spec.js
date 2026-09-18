@@ -1,6 +1,6 @@
 import { regions } from '../../../support/default-values.js'
 import { reloadUntilTextFound } from '../../../support/helpers/wait.helpers.js'
-import scenarioData from '../../../support/scenarios/licence-flagged-for-supplementary-with-current-annual-bill-run-and-second-company.scenario.js'
+import scenarioData from '../../../support/scenarios/licence-flagged-for-supplementary-with-second-company.scenario.js'
 import { expect, test } from '../../../support/fixtures.js'
 
 test.describe(
@@ -16,6 +16,8 @@ test.describe(
     test.beforeAll(async ({ setup }) => {
       const scenario = scenarioData()
 
+      await setup(scenario)
+
       const [companyFromScenario, secondCompanyFromScenario] = scenario.companies
 
       billingAccount = scenario.billingAccount
@@ -23,9 +25,7 @@ test.describe(
       secondCompany = secondCompanyFromScenario
       licence = scenario.licences[0]
 
-      toFinancialYearEnding = scenario.billRun.toFinancialYearEnding
-
-      await setup(scenario)
+      toFinancialYearEnding = scenario.billRuns[0].toFinancialYearEnding
     })
 
     test.beforeEach(async ({ login, users }) => {
@@ -116,7 +116,7 @@ test.describe(
       await page.getByRole('button', { name: 'Continue' }).click()
 
       await expect(page.locator('h1')).toContainText('Select the region')
-      await page.getByRole('radio', { name: regions.NORTH_EAST.displayName }).check()
+      await page.getByRole('radio', { name: regions.THAMES.displayName }).check()
       await page.getByRole('button', { name: 'Continue' }).click()
 
       await expect(page.locator('h1')).toContainText('Check the bill run to be created')
@@ -127,10 +127,10 @@ test.describe(
       await reloadUntilTextFound(page, page.locator('[data-test="bill-run-status-1"] > .govuk-tag'), 'ready')
       await page.locator('[data-test="date-created-1"] > .govuk-link').click()
 
-      await expect(page.locator('h1')).toContainText(`${regions.NORTH_EAST.displayName} supplementary`)
+      await expect(page.locator('h1')).toContainText(`${regions.THAMES.displayName} supplementary`)
       await expect(page.locator('#main-content > p > .govuk-tag')).toContainText('ready')
-      await expect(page.locator('[data-test="credits-count"]')).toContainText('1 credit note')
-      await expect(page.locator('[data-test="debits-count"]')).toContainText('4 invoices')
+      await expect(page.locator('[data-test="credits-count"]')).toContainText('2 credit notes')
+      await expect(page.locator('[data-test="debits-count"]')).toContainText('3 invoices')
 
       const abstractorsTable = page.locator('[data-test="other-abstractors"]')
       const secondCompanyRows = abstractorsTable.getByRole('row', { name: secondCompany.name })

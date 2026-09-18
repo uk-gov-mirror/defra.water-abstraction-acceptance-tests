@@ -1,13 +1,15 @@
-import buildBillRunEntity from '../entities/bill-run.entity.js'
+import buildBillRunEntities from '../entities/bill-runs.entities.js'
 import buildBillingAccountEntity from '../entities/billing-account.entity.js'
 import buildChargeVersionEntity from '../entities/charge-version.entity.js'
 import buildLicenceEntity from '../entities/licence.entity.js'
 import buildReturnVersionEntity from '../entities/return-version.entity.js'
 import { calculatedDates } from '../helpers/calculated-dates.helpers.js'
+import { markAsTwoPartTariff } from '../helpers/billing.helpers.js'
+import { mergeByKey } from '../helpers/scenario.helpers.js'
 import { regions } from '../default-values.js'
 import { buildReturnLogs, returnLogPeriods } from '../helpers/return-log.helpers.js'
 
-export const title = 'Licence with a two-part tariff return log and bill run'
+export const title = 'Licence with a two-part tariff return log and bill runs'
 export const description =
   'Licence with a two-part tariff return version, completed return log ready for editing, and a sent two-part tariff bill run for the same year so editing the return flags the licence for two-part tariff supplementary billing'
 
@@ -22,9 +24,15 @@ export default function (region = null) {
   const licenceEntity = buildLicenceEntity(region)
   const billingAccountEntity = buildBillingAccountEntity(licenceEntity, region)
   const chargeVersionEntity = buildChargeVersionEntity(licenceEntity, billingAccountEntity, region)
-  const billRunEntity = buildBillRunEntity(licenceEntity, billingAccountEntity, chargeVersionEntity, periods[0], region)
+  const billRunEntities = buildBillRunEntities(
+    licenceEntity,
+    billingAccountEntity,
+    chargeVersionEntity,
+    periods[0],
+    region
+  )
 
-  billRunEntity.billRun.batchType = 'two_part_tariff'
+  markAsTwoPartTariff(billRunEntities)
 
   const returnVersionEntity = buildReturnVersionEntity(licenceEntity)
 
@@ -49,7 +57,7 @@ export default function (region = null) {
     ...licenceEntity,
     ...billingAccountEntity,
     ...chargeVersionEntity,
-    ...billRunEntity,
+    ...mergeByKey(...billRunEntities),
     ...returnVersionEntity,
     returnLog
   }
