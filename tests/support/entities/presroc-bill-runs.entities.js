@@ -71,7 +71,7 @@ function _billRunEntity(licenceEntity, billingAccountEntity, presrocChargeVersio
   billRun.fromFinancialYearEnding = new Date(dates.endDate).getUTCFullYear()
   billRun.toFinancialYearEnding = new Date(dates.endDate).getUTCFullYear()
 
-  const bill = billData(billingAccount, billRun)
+  const bill = billData(billingAccount, billRun, region)
   const billLicence = billLicenceData(bill, licence)
 
   const minimumChargeAmount = _minimumChargeAmount(billRun.toFinancialYearEnding)
