@@ -2,7 +2,6 @@ import { calculatedDates } from '../../../../support/helpers/calculated-dates.he
 import { formatLongDate } from '../../../../support/helpers/date.helpers.js'
 import { regions } from '../../../../support/default-values.js'
 import { reloadUntilTextFound } from '../../../../support/helpers/wait.helpers.js'
-import scenarioData from '../../../../support/scenarios/licence-with-tpt-chg-vers-and-two-over-abstracted-returns.scenario.js'
 import { tableRow } from '../../../../support/helpers/govuk.helpers.js'
 import { expect, test } from '../../../../support/fixtures.js'
 
@@ -14,7 +13,7 @@ test.describe('Licence with Over-abstracted Returns (internal)', () => {
   let firstReturnReference
   let secondReturnReference
 
-  test.beforeAll(async ({ setup }) => {
+  test.beforeAll(async ({ world }) => {
     const {
       billingPeriods: {
         twoPartTariff: [twoPartTariffPeriod]
@@ -24,7 +23,7 @@ test.describe('Licence with Over-abstracted Returns (internal)', () => {
     endYear = new Date(twoPartTariffPeriod.endDate).getFullYear()
     startYear = new Date(twoPartTariffPeriod.startDate).getFullYear()
 
-    const scenario = scenarioData()
+    const scenario = world('licence-with-tpt-chg-vers-and-two-over-abstracted-returns.scenario.js')
 
     company = scenario.company
     licence = scenario.licence
@@ -32,8 +31,6 @@ test.describe('Licence with Over-abstracted Returns (internal)', () => {
     // requirements are seeded with independent random references, so we can't assume which sorts first on the page
     firstReturnReference = scenario.returnLogs[0].returnReference
     secondReturnReference = scenario.returnLogs[2].returnReference
-
-    await setup(scenario)
   })
 
   test.beforeEach(async ({ login, users }) => {

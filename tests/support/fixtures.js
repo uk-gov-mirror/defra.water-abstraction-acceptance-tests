@@ -4,8 +4,6 @@ import path from 'path'
 
 import buildWorldKey from '../../world/key.world.js'
 import config from '../config.js'
-import loadService from './load/load.service.js'
-import tearDownService from './tear-down/tear-down.service.js'
 import usersData from './data/users.data.js'
 
 export { expect } from '@playwright/test'
@@ -32,13 +30,6 @@ export const test = base.extend({
     })
   },
 
-  // eslint-disable-next-line no-empty-pattern
-  load: async ({}, use) => {
-    await use((data) => {
-      return loadService(data)
-    })
-  },
-
   login: async ({ page, defaultPassword }, use) => {
     await use(async (email) => {
       await page.goto('/signin')
@@ -54,20 +45,6 @@ export const test = base.extend({
       await page.fill('input#email', email)
       await page.fill('input#password', defaultPassword)
       await page.click('.govuk-button.govuk-button--start')
-    })
-  },
-
-  setup: async ({ tearDown, load }, use) => {
-    await use(async (scenario) => {
-      await tearDown()
-      await load(scenario)
-    })
-  },
-
-  // eslint-disable-next-line no-empty-pattern
-  tearDown: async ({}, use) => {
-    await use(async () => {
-      await tearDownService()
     })
   },
 

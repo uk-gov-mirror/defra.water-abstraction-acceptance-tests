@@ -2,7 +2,6 @@ import { calculatedDates } from '../../../../support/helpers/calculated-dates.he
 import { formatLongDate } from '../../../../support/helpers/date.helpers.js'
 import { regions } from '../../../../support/default-values.js'
 import { reloadUntilTextFound } from '../../../../support/helpers/wait.helpers.js'
-import scenarioData from '../../../../support/scenarios/licence-with-tpt-chg-vers-and-two-completed-return-logs.scenario.js'
 import { expect, test } from '../../../../support/fixtures.js'
 
 test.describe('Licence and Two Returns with No Issues (internal)', () => {
@@ -13,7 +12,7 @@ test.describe('Licence and Two Returns with No Issues (internal)', () => {
   let returnReference
   let startYear
 
-  test.beforeAll(async ({ setup }) => {
+  test.beforeAll(async ({ world }) => {
     const {
       billingPeriods: {
         twoPartTariff: [twoPartTariffPeriod]
@@ -23,14 +22,12 @@ test.describe('Licence and Two Returns with No Issues (internal)', () => {
     endYear = new Date(twoPartTariffPeriod.endDate).getFullYear()
     startYear = new Date(twoPartTariffPeriod.startDate).getFullYear()
 
-    const scenario = scenarioData()
+    const scenario = world('licence-with-tpt-chg-vers-and-two-completed-return-logs.scenario.js')
 
     billingAccount = scenario.billingAccount
     company = scenario.company
     licence = scenario.licence
     returnReference = scenario.returnLogs[0].returnReference
-
-    await setup(scenario)
   })
 
   test.beforeEach(async ({ login, users }) => {

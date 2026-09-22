@@ -2,7 +2,6 @@ import { calculatedDates } from '../../../../support/helpers/calculated-dates.he
 import { formatLongDate } from '../../../../support/helpers/date.helpers.js'
 import { regions } from '../../../../support/default-values.js'
 import { reloadUntilTextFound } from '../../../../support/helpers/wait.helpers.js'
-import scenarioData from '../../../../support/scenarios/licence-with-tpt-chg-vers-and-completed-non-tpt-return-log.scenario.js'
 import { expect, test } from '../../../../support/fixtures.js'
 
 test.describe('Licence with No Matching Returns (internal)', () => {
@@ -11,7 +10,7 @@ test.describe('Licence with No Matching Returns (internal)', () => {
   let startYear
   let licence
 
-  test.beforeAll(async ({ setup }) => {
+  test.beforeAll(async ({ world }) => {
     const {
       billingPeriods: {
         twoPartTariff: [twoPartTariffPeriod]
@@ -21,12 +20,10 @@ test.describe('Licence with No Matching Returns (internal)', () => {
     endYear = new Date(twoPartTariffPeriod.endDate).getFullYear()
     startYear = new Date(twoPartTariffPeriod.startDate).getFullYear()
 
-    const scenario = scenarioData()
+    const scenario = world('licence-with-tpt-chg-vers-and-completed-non-tpt-return-log.scenario.js')
 
     company = scenario.company
     licence = scenario.licence
-
-    await setup(scenario)
   })
 
   test.beforeEach(async ({ login, users }) => {
