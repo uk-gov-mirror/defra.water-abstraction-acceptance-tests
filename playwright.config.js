@@ -3,6 +3,7 @@ import { defineConfig } from '@playwright/test'
 import config from './tests/config.js'
 
 export default defineConfig({
+  globalSetup: './global.setup.js',
   forbidOnly: !!process.env.CI,
   fullyParallel: false,
   projects: [

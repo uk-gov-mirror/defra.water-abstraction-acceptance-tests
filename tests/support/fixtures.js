@@ -1,11 +1,17 @@
 import { test as base } from '@playwright/test'
+import fs from 'node:fs/promises'
+import path from 'path'
 
+import buildWorldKey from '../../world/key.world.js'
 import config from '../config.js'
 import loadService from './load/load.service.js'
 import tearDownService from './tear-down/tear-down.service.js'
 import usersData from './data/users.data.js'
 
 export { expect } from '@playwright/test'
+
+// Module-level variable serves as the in-memory cache
+let cachedWorldData = null
 
 export const test = base.extend({
   // eslint-disable-next-line no-empty-pattern
@@ -74,5 +80,22 @@ export const test = base.extend({
   // eslint-disable-next-line no-empty-pattern
   users: async ({}, use) => {
     await use(usersData)
+  },
+
+  // eslint-disable-next-line no-empty-pattern
+  world: async ({}, use, testInfo) => {
+    // Only read disk if cache is empty
+    if (!cachedWorldData) {
+      const filePath = path.join(process.cwd(), 'world/world.json')
+      const rawData = await fs.readFile(filePath, 'utf-8')
+      cachedWorldData = JSON.parse(rawData)
+    }
+
+    // Hand back a lookup function scoped to this spec, so a test just calls world('some.scenario.js')
+    await use((scenarioFilename) => {
+      const key = buildWorldKey(scenarioFilename, testInfo.file)
+
+      return cachedWorldData[key]
+    })
   }
 })

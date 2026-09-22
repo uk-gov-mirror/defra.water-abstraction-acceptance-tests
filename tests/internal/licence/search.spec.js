@@ -1,15 +1,12 @@
-import scenarioData from '../../support/scenarios/licence.scenario.js'
 import { expect, test } from '../../support/fixtures.js'
 
 test.describe('Search for a licence (internal)', () => {
   let licence
 
-  test.beforeAll(async ({ setup }) => {
-    const scenario = scenarioData()
+  test.beforeAll(async ({ world }) => {
+    const data = world('licence.scenario.js')
 
-    licence = scenario.licence
-
-    await setup(scenario)
+    licence = data.licence
   })
 
   test.beforeEach(async ({ login, users }) => {
