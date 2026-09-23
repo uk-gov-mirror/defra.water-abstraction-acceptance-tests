@@ -74,7 +74,7 @@ test.describe('Remove a bill from an annual bill run that has not been sent (int
 
     await expect(page.locator('h1')).toContainText(`${regions.WALES.displayName} annual`)
     await expect(page.locator('#main-content > p > .govuk-tag')).toContainText('ready', { timeout: 20000 })
-    await expect(otherAbstractorsTable.locator('tbody > tr')).toHaveCount(1)
+    await expect(otherAbstractorsTable.locator('tbody > tr')).toHaveCount(3)
 
     await page.getByRole('link', { name: 'Search' }).click()
     await page.locator('#query').fill(licenceToRemove.licenceRef)

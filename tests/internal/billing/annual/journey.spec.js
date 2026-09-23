@@ -66,7 +66,7 @@ test.describe('Create and send annual bill run (internal)', () => {
     await expect(billRunRow.getByRole('cell', { name: formattedCurrentDate })).toBeVisible()
     await expect(billRunRow.getByRole('cell', { name: regions.ANGLIAN.displayName, exact: true })).toBeVisible()
     await expect(billRunRow.getByRole('cell', { name: 'Annual', exact: true })).toBeVisible()
-    await expect(billRunRow.locator('[data-test^="number-of-bills-"]')).toContainText('1')
+    await expect(billRunRow.locator('[data-test^="number-of-bills-"]')).toContainText('3')
     await expect(billRunRow.locator('.govuk-tag')).toContainText('sent')
   })
 })

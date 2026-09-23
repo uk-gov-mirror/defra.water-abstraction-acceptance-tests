@@ -10,21 +10,66 @@ const TEST_DIRS = ['tests/internal', 'tests/external']
 /**
  * Seed one independent copy of a scenario's data for every test that requires it, then write the
  * combined result to world.json for tests to read via the `world` fixture
- *
  */
 export default async function createWorld() {
   const tests = await listTests()
-
   const aggregatedScenarioData = {}
 
+  // STEP 1: Load all scenario data into memory first
   for (const test of tests) {
-    const scenarioData = await _scenarioData(test.scenarioPath)
-    await loadService(scenarioData)
-
-    aggregatedScenarioData[test.key] = scenarioData
+    aggregatedScenarioData[test.key] = await _scenarioData(test.scenarioPath)
   }
 
+  // STEP 2: Strip duplicates across all scenarios BEFORE seeding/loading
+  _protectWorld(aggregatedScenarioData)
+
+  // STEP 3: Seed the cleaned data via loadService
+  for (const scenarioData of Object.values(aggregatedScenarioData)) {
+    await loadService(scenarioData)
+  }
+
+  // STEP 4: Write the cleaned dataset to world.json
   await saveWorld(aggregatedScenarioData)
+}
+
+function _protectWorld(aggregatedScenarioData) {
+  const uniqueBillRuns = new Set()
+  const scenKey = {}
+
+  for (const [scenarioKey, aggregatedScenario] of Object.entries(aggregatedScenarioData || {})) {
+    if (Array.isArray(aggregatedScenario.billRuns)) {
+      aggregatedScenario.billRuns = aggregatedScenario.billRuns.filter((billRun) => {
+        if (billRun?.batchType === 'annual') {
+          const year = String(billRun.fromFinancialYearEnding)
+          const region = String(billRun.regionId.value)
+          const key = `annual_${year}_${region}`
+
+          if (uniqueBillRuns.has(key)) {
+            console.log('Previous scenario', scenKey[key])
+            console.log(`[DELETED DUPLICATE] Removed ${key} from ${scenarioKey}`)
+
+            return false
+          }
+
+          uniqueBillRuns.add(key)
+          scenKey[key] = scenarioKey
+          return true // Retains first occurrence
+        }
+
+        return true // Keep non-annual items
+      })
+
+      // Clean up property if array is now empty
+      if (aggregatedScenario.billRuns.length === 0) {
+        delete aggregatedScenario.billRuns
+        delete aggregatedScenario.bills
+        delete aggregatedScenario.transactions
+        delete aggregatedScenario.billLicences
+      }
+    }
+  }
+
+  console.log('Unique Bill Run Keys Registered:', [...uniqueBillRuns])
 }
 
 /**

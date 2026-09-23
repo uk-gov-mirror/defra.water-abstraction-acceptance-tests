@@ -4,6 +4,9 @@ import { SROC_FIRST_FINANCIAL_YEAR, formatLongDate } from '../../../support/help
 import { expect, test } from '../../../support/fixtures.js'
 import { regions, srocStartDate } from '../../../support/default-values.js'
 
+// this needs to add chnages from the other spec
+// this becomes - replace charge version
+// no need for licence ith supplementry - can use just an annual
 test.describe(
   'Replace charge version in the 2023 financial year with no changes (internal)',
   { tag: '@supplementary-billing' },
