@@ -39,3 +39,6 @@ node_modules/
 # is retained as it is used for documentation.
 .env
 .env.local
+
+
+cli/src/world/world.json
