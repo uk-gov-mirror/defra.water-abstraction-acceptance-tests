@@ -33,15 +33,17 @@ export function addPurposeToNewVersion(licenceEntity, region) {
 /**
  * Give a licence a new licence version because a detail on the last one was wrong
  *
- * The new version is the next increment of the same issue. Nothing else changes.
+ * The new version is the next increment of the same issue. Nothing else changes. It starts on `startDate` where it is
+ * given one, and otherwise 60 days after the last.
  *
  * @param {object} licenceEntity - the licence entity to change
  * @param {object} region - the region the licence is in
+ * @param {string} [startDate] - the date the new version starts, for example '2024-04-01'
  *
  * @returns {object} the same licence entity
  */
-export function correct(licenceEntity, region) {
-  const { previous, current } = _newLicenceVersion(licenceEntity, region)
+export function correct(licenceEntity, region, startDate) {
+  const { previous, current } = _newLicenceVersion(licenceEntity, region, startDate)
 
   current.issue = previous.issue
   current.increment = previous.increment + 1
@@ -50,37 +52,21 @@ export function correct(licenceEntity, region) {
 }
 
 /**
- * Change the issue of a licence's first licence version
- *
- * A licence is built with a licence version of issue 1. This gives it another, for example 100.
- *
- * Call this before any licence versions are added to the licence, as a new one is numbered from the one before.
- *
- * @param {object} licenceEntity - the licence entity to change
- * @param {number} issue - the issue of the first licence version, for example 100
- *
- * @returns {object} the same licence entity
- */
-export function firstIssue(licenceEntity, issue) {
-  licenceEntity.licenceVersion.issue = issue
-
-  return licenceEntity
-}
-
-/**
  * Give a licence a new licence version because it was transferred to a new licence holder
  *
  * The new version is the next issue, and is for a different company at a different address. The previous licence
- * holder's document role ends when their version does, and the new licence holder's starts when theirs does.
+ * holder's document role ends when their version does, and the new licence holder's starts when theirs does. It starts
+ * on `startDate` where it is given one, and otherwise 60 days after the last.
  *
  * @param {object} licenceEntity - the licence entity to change
  * @param {object} region - the region the licence is in
+ * @param {string} [startDate] - the date the new version starts, for example '2024-04-01'
  *
  * @returns {object} the same licence entity
  */
-export function transfer(licenceEntity, region) {
+export function transfer(licenceEntity, region, startDate) {
   const { licenceDocument } = licenceEntity
-  const { previous, current } = _newLicenceVersion(licenceEntity, region)
+  const { previous, current } = _newLicenceVersion(licenceEntity, region, startDate)
 
   const company = companyData(region)
   const address = addressData()
@@ -88,12 +74,6 @@ export function transfer(licenceEntity, region) {
   current.issue = previous.issue + 1
   current.companyId = company.id
   current.addressId = address.id
-
-  // A licence is built with one of each. The first time this is called they are put into lists we can add to
-  licenceEntity.companies ??= [licenceEntity.company]
-  licenceEntity.addresses ??= [licenceEntity.address]
-  licenceEntity.companyAddresses ??= [licenceEntity.companyAddress]
-  licenceEntity.licenceDocumentRoles ??= [licenceEntity.licenceDocumentRole]
 
   const previousRole = licenceEntity.licenceDocumentRoles.at(-1)
   const currentRole = licenceDocumentRoleData(licenceDocument, company, address)
@@ -111,6 +91,9 @@ export function transfer(licenceEntity, region) {
   licenceEntity.companyAddresses.push(companyAddressData(company, address))
   licenceEntity.licenceDocumentRoles.push(currentRole)
 
+  licenceEntity.licenceDocumentHeader.metadata.Name = company.name
+  licenceEntity.licenceDocumentHeader.metadata.contacts[0].name = company.name
+
   return licenceEntity
 }
 
@@ -125,7 +108,8 @@ function _addDays(date, days) {
 /**
  * Supersede a licence's latest licence version and add a new current one
  *
- * The new version starts 60 days after the one it replaces, which ends the day before. It is for the same licence
+ * The new version starts on `startDate` where it is given one, and otherwise 60 days after the one it replaces, which
+ * ends the day before. It is for the same licence
  * holder, and has a copy of every purpose the version it replaces had, each linked to the same points and with the same
  * conditions.
  *
@@ -133,20 +117,13 @@ function _addDays(date, days) {
  *
  * @private
  */
-function _newLicenceVersion(licenceEntity, region) {
-  const { address, company, licence } = licenceEntity
-
-  // A licence is built with one of each. The first time this is called they are put into lists we can add to
-  licenceEntity.licenceVersions ??= [licenceEntity.licenceVersion]
-  licenceEntity.licenceVersionPurposes ??= [licenceEntity.licenceVersionPurpose]
-  licenceEntity.licenceVersionPurposePoints ??= [licenceEntity.licenceVersionPurposePoint]
+function _newLicenceVersion(licenceEntity, region, startDate) {
+  const { licence } = licenceEntity
 
   const previous = licenceEntity.licenceVersions.at(-1)
-  const current = licenceVersionData(licence, company, address, region)
+  const current = licenceVersionData(licence, { id: previous.companyId }, { id: previous.addressId }, region)
 
-  current.startDate = _addDays(previous.startDate, 60)
-  current.companyId = previous.companyId
-  current.addressId = previous.addressId
+  current.startDate = startDate ?? _addDays(previous.startDate, 60)
 
   previous.status = 'superseded'
   previous.endDate = _addDays(current.startDate, -1)

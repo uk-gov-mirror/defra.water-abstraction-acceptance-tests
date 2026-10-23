@@ -1,4 +1,6 @@
-import { formatDateToIso, relativeToToday, today } from '../../../../../tests/support/helpers/date.helpers.js'
+import LicenceModel from 'water-abstraction-engine/models/licence.model.js'
+
+import { formatDateToIso, relativeToToday } from '../../../../../tests/support/helpers/date.helpers.js'
 
 /**
  * Revoke a licence 30 days ago
@@ -52,24 +54,6 @@ export function expireInFuture(licenceEntity) {
 }
 
 /**
- * Whether a licence is still live, which is when it has not been revoked or lapsed, and has not expired or expires in
- * the future
- *
- * @param {object} licenceEntity - the licence entity to check
- *
- * @returns {boolean} true if the licence is live
- */
-export function isLive(licenceEntity) {
-  const { expiredDate, lapsedDate, revokedDate } = licenceEntity.licence
-
-  if (revokedDate || lapsedDate) {
-    return false
-  }
-
-  return !expiredDate || expiredDate > formatDateToIso(today())
-}
-
-/**
  * Lapse a licence 60 days ago
  *
  * Uncommon.
@@ -88,6 +72,25 @@ export function lapse(licenceEntity) {
 }
 
 /**
+ * The engine's licence model for a licence's end dates, so we can use what it works out from them
+ *
+ * The model compares the dates as `Date`s, so ours are converted for it.
+ *
+ * @param {object} licenceEntity - the licence entity whose end dates to use
+ *
+ * @returns {object} a licence model with the licence's expired, lapsed and revoked dates
+ */
+export function licenceModel(licenceEntity) {
+  const { expiredDate, lapsedDate, revokedDate } = licenceEntity.licence
+
+  return LicenceModel.fromJson({
+    expiredDate: expiredDate ? new Date(expiredDate) : null,
+    lapsedDate: lapsedDate ? new Date(lapsedDate) : null,
+    revokedDate: revokedDate ? new Date(revokedDate) : null
+  })
+}
+
+/**
  * End the licence document and document role on the date the licence ended
  *
  * When a licence has more than one end date they end on the earliest.
@@ -95,12 +98,12 @@ export function lapse(licenceEntity) {
  * @private
  */
 function _endDocument(licenceEntity, endDate) {
-  const { licenceDocument, licenceDocumentRole } = licenceEntity
+  const { licenceDocument, licenceDocumentRoles } = licenceEntity
 
   if (licenceDocument.endDate && licenceDocument.endDate < endDate) {
     return
   }
 
   licenceDocument.endDate = endDate
-  licenceDocumentRole.endDate = endDate
+  licenceDocumentRoles[0].endDate = endDate
 }
