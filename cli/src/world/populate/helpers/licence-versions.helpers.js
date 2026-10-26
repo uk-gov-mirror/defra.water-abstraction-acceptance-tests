@@ -1,14 +1,14 @@
-import { addPurpose } from './purposes.helpers.js'
+import { addDays } from '../../../../../tests/support/helpers/date.helpers.js'
 import addressData from '../../../../../tests/support/data/address.data.js'
 import companyAddressData from '../../../../../tests/support/data/company-address.data.js'
 import companyData from '../../../../../tests/support/data/company.data.js'
 import { conditionExternalId } from './conditions.helpers.js'
-import { formatDateToIso } from '../../../../../tests/support/helpers/date.helpers.js'
 import licenceDocumentRoleData from '../../../../../tests/support/data/licence-document-role.data.js'
 import licenceVersionData from '../../../../../tests/support/data/licence-version.data.js'
 import licenceVersionPurposeConditionData from '../../../../../tests/support/data/licence-version-purpose-condition.data.js'
 import licenceVersionPurposeData from '../../../../../tests/support/data/licence-version-purpose.data.js'
 import licenceVersionPurposePointData from '../../../../../tests/support/data/licence-version-purpose-point.data.js'
+import { addPurpose, purposesOn } from './purposes.helpers.js'
 
 /**
  * Give a licence a new licence version because a purpose was added
@@ -97,12 +97,43 @@ export function transfer(licenceEntity, region, startDate) {
   return licenceEntity
 }
 
-function _addDays(date, days) {
-  const result = new Date(date)
+/**
+ * Why a licence version changed from the one before it
+ *
+ * A licence version for a new licence holder is a transfer. One with the same issue is a correction. Any other is a new
+ * issue for the same licence holder, which is a purpose being added.
+ *
+ * @param {object} previousLicenceVersion - the licence version before it
+ * @param {object} licenceVersion - the licence version that changed
+ *
+ * @returns {string} 'transfer', 'correction' or 'new-issue'
+ */
+export function licenceVersionChange(previousLicenceVersion, licenceVersion) {
+  if (licenceVersion.companyId !== previousLicenceVersion.companyId) {
+    return 'transfer'
+  }
 
-  result.setUTCDate(result.getUTCDate() + days)
+  if (licenceVersion.issue === previousLicenceVersion.issue) {
+    return 'correction'
+  }
 
-  return formatDateToIso(result)
+  return 'new-issue'
+}
+
+/**
+ * The licence version in force on a date, which is the latest one to start on or before it
+ *
+ * @param {object} licenceEntity - the licence entity to look in
+ * @param {string} date - the date, for example '2025-04-01'
+ *
+ * @returns {object} the licence version
+ */
+export function licenceVersionOn(licenceEntity, date) {
+  const startedBefore = licenceEntity.licenceVersions.filter((licenceVersion) => {
+    return licenceVersion.startDate <= date
+  })
+
+  return startedBefore.at(-1)
 }
 
 /**
@@ -123,14 +154,12 @@ function _newLicenceVersion(licenceEntity, region, startDate) {
   const previous = licenceEntity.licenceVersions.at(-1)
   const current = licenceVersionData(licence, { id: previous.companyId }, { id: previous.addressId }, region)
 
-  current.startDate = startDate ?? _addDays(previous.startDate, 60)
+  current.startDate = startDate ?? addDays(previous.startDate, 60)
 
   previous.status = 'superseded'
-  previous.endDate = _addDays(current.startDate, -1)
+  previous.endDate = addDays(current.startDate, -1)
 
-  const previousPurposes = licenceEntity.licenceVersionPurposes.filter((licenceVersionPurpose) => {
-    return licenceVersionPurpose.licenceVersionId === previous.id
-  })
+  const previousPurposes = purposesOn(licenceEntity, previous)
 
   for (const previousPurpose of previousPurposes) {
     const purpose = licenceVersionPurposeData(current, region)

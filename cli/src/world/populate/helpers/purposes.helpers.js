@@ -20,9 +20,7 @@ export function addPurpose(licenceEntity, region) {
   // The current licence version is the last one
   const currentLicenceVersion = licenceEntity.licenceVersions.at(-1)
 
-  const existingPurposes = licenceEntity.licenceVersionPurposes.filter((licenceVersionPurpose) => {
-    return licenceVersionPurpose.licenceVersionId === currentLicenceVersion.id
-  })
+  const existingPurposes = purposesOn(licenceEntity, currentLicenceVersion)
 
   const purpose = licenceVersionPurposeData(currentLicenceVersion, region)
 
@@ -42,7 +40,19 @@ export function addPurpose(licenceEntity, region) {
 export function currentPurpose(licenceEntity) {
   const currentLicenceVersion = licenceEntity.licenceVersions.at(-1)
 
-  return licenceEntity.licenceVersionPurposes.find((licenceVersionPurpose) => {
-    return licenceVersionPurpose.licenceVersionId === currentLicenceVersion.id
+  return purposesOn(licenceEntity, currentLicenceVersion)[0]
+}
+
+/**
+ * The purposes on a licence version
+ *
+ * @param {object} licenceEntity - the licence entity to look in
+ * @param {object} licenceVersion - the licence version whose purposes to find
+ *
+ * @returns {object[]} the licence version purposes
+ */
+export function purposesOn(licenceEntity, licenceVersion) {
+  return licenceEntity.licenceVersionPurposes.filter((licenceVersionPurpose) => {
+    return licenceVersionPurpose.licenceVersionId === licenceVersion.id
   })
 }

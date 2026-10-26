@@ -6,6 +6,7 @@ import chargeElementData from '../../../../tests/support/data/charge-element.dat
 import chargeReferenceData from '../../../../tests/support/data/charge-reference.data.js'
 import chargeVersionData from '../../../../tests/support/data/charge-version.data.js'
 import { licenceModel } from './helpers/end-dates.helpers.js'
+import { purposesOn } from './helpers/purposes.helpers.js'
 import { regionOf } from './helpers/regions.helpers.js'
 import { srocStartDate } from '../../../../tests/support/default-values.js'
 import workflowData from '../../../../tests/support/data/workflow.data.js'
@@ -107,9 +108,7 @@ function _inReview(licenceEntity, billingAccounts) {
   const reason = licence.startDate < srocStartDate ? ChangeReasonHelper.select(24) : ChangeReasonHelper.select(11)
 
   const chargeVersion = chargeVersionData(billingAccount, licence, regionOf(licenceEntity).region)
-  const firstPurpose = licenceEntity.licenceVersionPurposes.find((licenceVersionPurpose) => {
-    return licenceVersionPurpose.licenceVersionId === licenceVersion.id
-  })
+  const firstPurpose = purposesOn(licenceEntity, licenceVersion)[0]
   const chargeReference = chargeReferenceData(chargeVersion, [firstPurpose])
   const chargeElement = chargeElementData(chargeReference, firstPurpose)
 

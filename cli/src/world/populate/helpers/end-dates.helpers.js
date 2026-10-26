@@ -72,6 +72,19 @@ export function lapse(licenceEntity) {
 }
 
 /**
+ * The date a licence ended or will end, which is the earliest of when it expired, lapsed and was revoked
+ *
+ * @param {object} licenceEntity - the licence entity whose end dates to use
+ *
+ * @returns {string|null} the date as YYYY-MM-DD, for example '2024-03-31', or null where the licence has no end date
+ */
+export function licenceEndDate(licenceEntity) {
+  const ends = licenceModel(licenceEntity).$ends()
+
+  return ends ? formatDateToIso(ends.date) : null
+}
+
+/**
  * The engine's licence model for a licence's end dates, so we can use what it works out from them
  *
  * The model compares the dates as `Date`s, so ours are converted for it.

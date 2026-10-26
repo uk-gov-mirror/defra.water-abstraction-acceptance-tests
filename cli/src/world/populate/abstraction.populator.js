@@ -1,5 +1,6 @@
 import licenceVersionPurposePointData from '../../../../tests/support/data/licence-version-purpose-point.data.js'
 import pointData from '../../../../tests/support/data/point.data.js'
+import { purposesOn } from './helpers/purposes.helpers.js'
 import { regionOf } from './helpers/regions.helpers.js'
 
 // The abstraction periods the licences abstract during. Each licence takes the next one, going back to the start of the
@@ -94,7 +95,6 @@ export default function abstraction(licenceEntities) {
  */
 function _abstractFrom(licenceEntity, region, points) {
   const licenceVersions = licenceEntity.licenceVersions
-  const licenceVersionPurposes = licenceEntity.licenceVersionPurposes
 
   while (licenceEntity.points.length < points) {
     const point = pointData(region)
@@ -105,9 +105,7 @@ function _abstractFrom(licenceEntity, region, points) {
     licenceEntity.points.push(point)
 
     for (const licenceVersion of licenceVersions) {
-      const firstPurpose = licenceVersionPurposes.find((licenceVersionPurpose) => {
-        return licenceVersionPurpose.licenceVersionId === licenceVersion.id
-      })
+      const firstPurpose = purposesOn(licenceEntity, licenceVersion)[0]
 
       licenceEntity.licenceVersionPurposePoints.push(licenceVersionPurposePointData(firstPurpose, point))
     }
@@ -151,12 +149,9 @@ function _abstractDuring(licenceEntity, abstractionPeriod) {
  */
 function _abstractUpTo(licenceEntity, quantities, first) {
   const licenceVersions = licenceEntity.licenceVersions
-  const licenceVersionPurposes = licenceEntity.licenceVersionPurposes
 
   for (const licenceVersion of licenceVersions) {
-    const purposesOnVersion = licenceVersionPurposes.filter((licenceVersionPurpose) => {
-      return licenceVersionPurpose.licenceVersionId === licenceVersion.id
-    })
+    const purposesOnVersion = purposesOn(licenceEntity, licenceVersion)
 
     for (let i = 0; i < purposesOnVersion.length; i++) {
       const { annual, daily, hourly, instant } = quantities[(first + i) % quantities.length]

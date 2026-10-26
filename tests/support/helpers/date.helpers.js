@@ -13,6 +13,22 @@ export const PRESROC_LAST_FINANCIAL_YEAR = 2022
 export const SROC_FIRST_FINANCIAL_YEAR = 2023
 
 /**
+ * Adds a number of days to a date, or takes them away where `days` is negative
+ *
+ * @param {Date | string} date - The date to add the days to, for example '2024-04-01'
+ * @param {number} days - The number of days to add, for example -1 for the day before
+ *
+ * @returns {string} The new date formatted as YYYY-MM-DD, for example '2024-03-31'
+ */
+export function addDays(date, days) {
+  const result = new Date(date)
+
+  result.setUTCDate(result.getUTCDate() + days)
+
+  return formatDateToIso(result)
+}
+
+/**
  * Works out how many presroc and sroc billing periods a supplementary bill run is expected to generate bills for
  *
  * The two schemes are calculated independently, by two different engines, each with their own rule:
