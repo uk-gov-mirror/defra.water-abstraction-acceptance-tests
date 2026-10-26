@@ -1,5 +1,4 @@
-import { formatDateToIso } from '../../../../tests/support/helpers/date.helpers.js'
-import { licenceModel } from './helpers/end-dates.helpers.js'
+import { licenceEndDate } from './helpers/end-dates.helpers.js'
 
 /**
  * Make each company address the licence holder address of its company, as the import does
@@ -48,12 +47,11 @@ function _heldVersions(licenceEntities) {
   const heldVersions = new Map()
 
   for (const licenceEntity of licenceEntities) {
-    const ends = licenceModel(licenceEntity).$ends()
-    const licenceEndDate = ends ? formatDateToIso(ends.date) : null
+    const endDate = licenceEndDate(licenceEntity)
 
     for (const licenceVersion of licenceEntity.licenceVersions) {
       const key = _key(licenceVersion)
-      const endDates = [licenceVersion.endDate, licenceEndDate].filter(Boolean).sort()
+      const endDates = [licenceVersion.endDate, endDate].filter(Boolean).sort()
 
       if (!heldVersions.has(key)) {
         heldVersions.set(key, [])

@@ -3,6 +3,7 @@ import ChargeCategoryHelper from 'water-abstraction-engine/test/helpers/charge-c
 import SupportedSourceHelper from 'water-abstraction-engine/test/helpers/supported-source.helper.js'
 import { generateUUID } from 'water-abstraction-engine/test/generators.js'
 
+import { addDays } from '../../../../tests/support/helpers/date.helpers.js'
 import addressData from '../../../../tests/support/data/address.data.js'
 import billingAccountAddressData from '../../../../tests/support/data/billing-account-address.data.js'
 import buildBillingAccountEntity from '../../../../tests/support/entities/billing-account.entity.js'
@@ -10,9 +11,10 @@ import chargeElementData from '../../../../tests/support/data/charge-element.dat
 import chargeReferenceData from '../../../../tests/support/data/charge-reference.data.js'
 import chargeReferencePresrocData from '../../../../tests/support/data/charge-reference-presroc.data.js'
 import chargeVersionData from '../../../../tests/support/data/charge-version.data.js'
-import { formatDateToIso } from '../../../../tests/support/helpers/date.helpers.js'
 import licenceAgreementData from '../../../../tests/support/data/licence-agreement.data.js'
-import { licenceModel } from './helpers/end-dates.helpers.js'
+import { licenceEndDate, licenceModel } from './helpers/end-dates.helpers.js'
+import { licenceVersionChange, licenceVersionOn } from './helpers/licence-versions.helpers.js'
+import { purposesOn } from './helpers/purposes.helpers.js'
 import { regionOf } from './helpers/regions.helpers.js'
 import { srocStartDate } from '../../../../tests/support/default-values.js'
 
@@ -165,7 +167,7 @@ function _chargeLicencesFromAlcs(licenceEntities, billingAccountEntities) {
 
   const openLicenceEntities = alcsLicenceEntities
     .filter((licenceEntity) => {
-      const endDate = _endDate(licenceEntity)
+      const endDate = licenceEndDate(licenceEntity)
 
       return endDate && endDate < srocStartDate
     })
@@ -176,7 +178,7 @@ function _chargeLicencesFromAlcs(licenceEntities, billingAccountEntities) {
   const referenceEachPurposeLicenceEntities = referencedLicenceEntities
     .filter((licenceEntity) => {
       return licenceEntity.licenceVersions.some((licenceVersion) => {
-        return licenceVersion.startDate < srocStartDate && _purposesOn(licenceEntity, licenceVersion).length === 2
+        return licenceVersion.startDate < srocStartDate && purposesOn(licenceEntity, licenceVersion).length === 2
       })
     })
     .filter((_licenceEntity, index) => {
@@ -248,7 +250,7 @@ function _chargeLiveLicencesFromSroc(licenceEntities, billingAccountEntities) {
  */
 function _chargeEndedLicencesFromSroc(licenceEntities, billingAccountEntities) {
   for (const licenceEntity of licenceEntities) {
-    if (licenceModel(licenceEntity).$ended() && _endDate(licenceEntity) >= srocStartDate) {
+    if (licenceModel(licenceEntity).$ended() && licenceEndDate(licenceEntity) >= srocStartDate) {
       _chargeFromSroc(licenceEntity, billingAccountEntities)
     }
   }
@@ -289,7 +291,7 @@ function _chargeBothPurposes(licenceEntities) {
  */
 function _twoPurposeCharges(licenceEntity) {
   return _srocChargeVersions(licenceEntity).flatMap((chargeVersion) => {
-    const licenceVersionPurposes = _purposesOn(licenceEntity, _licenceVersionFor(licenceEntity, chargeVersion))
+    const licenceVersionPurposes = purposesOn(licenceEntity, licenceVersionOn(licenceEntity, chargeVersion.startDate))
     const chargeReference = licenceEntity.chargeReferences.find((srocChargeReference) => {
       return srocChargeReference.chargeVersionId === chargeVersion.id
     })
@@ -482,7 +484,7 @@ function _addOtherAgreements(licenceEntities) {
  * @private
  */
 function _chargeFromAlcs(licenceEntity, billingAccountEntities, referenced, open, referenceEachPurpose) {
-  const endDate = _endDate(licenceEntity)
+  const endDate = licenceEndDate(licenceEntity)
   const alcsEndDate = _alcsEndDate(licenceEntity)
   const alcsLicenceVersions = licenceEntity.licenceVersions.filter((licenceVersion) => {
     return licenceVersion.startDate < srocStartDate && (!endDate || licenceVersion.startDate <= endDate)
@@ -517,7 +519,7 @@ function _chargeFromAlcs(licenceEntity, billingAccountEntities, referenced, open
       continue
     }
 
-    const licenceVersionPurposes = _purposesOn(licenceEntity, licenceVersion)
+    const licenceVersionPurposes = purposesOn(licenceEntity, licenceVersion)
     const purposesToReference =
       referenceEachPurpose && licenceVersionPurposes.length === 2 ? licenceVersionPurposes : [licenceVersionPurposes[0]]
 
@@ -651,7 +653,7 @@ function _chargeFromSroc(licenceEntity, billingAccountEntities) {
       chargeVersion.changeReasonId.value = ChangeReasonHelper.select(24).description
     }
 
-    const firstPurpose = _purposesOn(licenceEntity, licenceVersion)[0]
+    const firstPurpose = purposesOn(licenceEntity, licenceVersion)[0]
     const chargeReference = chargeReferenceData(chargeVersion, [firstPurpose])
 
     licenceEntity.chargeVersions.push(chargeVersion)
@@ -668,7 +670,7 @@ function _chargeFromSroc(licenceEntity, billingAccountEntities) {
  * @private
  */
 function _srocLicenceVersions(licenceEntity) {
-  const endDate = _endDate(licenceEntity)
+  const endDate = licenceEndDate(licenceEntity)
 
   return licenceEntity.licenceVersions.filter((licenceVersion) => {
     return (
@@ -685,17 +687,13 @@ function _srocLicenceVersions(licenceEntity) {
  * @private
  */
 function _alcsEndDate(licenceEntity) {
-  const endDate = _endDate(licenceEntity)
+  const endDate = licenceEndDate(licenceEntity)
 
   if (endDate && endDate < srocStartDate) {
     return endDate
   }
 
-  const alcsEndDate = new Date(srocStartDate)
-
-  alcsEndDate.setUTCDate(alcsEndDate.getUTCDate() - 1)
-
-  return formatDateToIso(alcsEndDate)
+  return addDays(srocStartDate, -1)
 }
 
 /**
@@ -812,47 +810,20 @@ function _chargeCategory(chargeReference) {
 }
 
 /**
- * The licence version a charge version covers, which is the one in force when it starts
- *
- * @private
- */
-function _licenceVersionFor(licenceEntity, chargeVersion) {
-  const startedBefore = licenceEntity.licenceVersions.filter((licenceVersion) => {
-    return licenceVersion.startDate <= chargeVersion.startDate
-  })
-
-  return startedBefore.at(-1)
-}
-
-/**
- * The purposes on a licence version
- *
- * @private
- */
-function _purposesOn(licenceEntity, licenceVersion) {
-  return licenceEntity.licenceVersionPurposes.filter((licenceVersionPurpose) => {
-    return licenceVersionPurpose.licenceVersionId === licenceVersion.id
-  })
-}
-
-/**
  * The change reason for a charge version, from why its licence version changed from the one before
  *
- * A licence version for a new licence holder is a transfer. One with the same issue is a correction, so a minor change.
- * Any other is a new issue for the same licence holder, which is a purpose being added, so a major change.
+ * A transfer is a succession or transfer, a correction is a minor change, and a new issue is a major change.
  *
  * @private
  */
 function _changeReason(previousLicenceVersion, licenceVersion) {
-  if (licenceVersion.companyId !== previousLicenceVersion.companyId) {
-    return ChangeReasonHelper.select(8).description
+  const CHANGE_REASONS = {
+    transfer: ChangeReasonHelper.select(8).description,
+    correction: ChangeReasonHelper.select(1).description,
+    'new-issue': ChangeReasonHelper.select(0).description
   }
 
-  if (licenceVersion.issue === previousLicenceVersion.issue) {
-    return ChangeReasonHelper.select(1).description
-  }
-
-  return ChangeReasonHelper.select(0).description
+  return CHANGE_REASONS[licenceVersionChange(previousLicenceVersion, licenceVersion)]
 }
 
 /**
@@ -869,15 +840,4 @@ function _chargeVersionFor(licenceEntity, licenceVersion, billingAccountEntities
   chargeVersion.companyId = billingAccount.companyId
 
   return chargeVersion
-}
-
-/**
- * The date a licence ended or will end, which is the earliest of when it expired, lapsed and was revoked
- *
- * @private
- */
-function _endDate(licenceEntity) {
-  const ends = licenceModel(licenceEntity).$ends()
-
-  return ends ? formatDateToIso(ends.date) : null
 }
