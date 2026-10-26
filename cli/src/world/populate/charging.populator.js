@@ -12,11 +12,11 @@ import chargeReferenceData from '../../../../tests/support/data/charge-reference
 import chargeReferencePresrocData from '../../../../tests/support/data/charge-reference-presroc.data.js'
 import chargeVersionData from '../../../../tests/support/data/charge-version.data.js'
 import licenceAgreementData from '../../../../tests/support/data/licence-agreement.data.js'
-import { licenceEndDate, licenceModel } from './helpers/end-dates.helpers.js'
-import { licenceVersionChange, licenceVersionOn } from './helpers/licence-versions.helpers.js'
 import { purposesOn } from './helpers/purposes.helpers.js'
 import { regionOf } from './helpers/regions.helpers.js'
 import { srocStartDate } from '../../../../tests/support/default-values.js'
+import { licenceEndDate, licenceModel } from './helpers/end-dates.helpers.js'
+import { licenceVersionChange, licenceVersionOn } from './helpers/licence-versions.helpers.js'
 
 /**
  * Charge the licences

@@ -1,5 +1,4 @@
 import { addDays } from '../../../../../tests/support/helpers/date.helpers.js'
-import { addPurpose, purposesOn } from './purposes.helpers.js'
 import addressData from '../../../../../tests/support/data/address.data.js'
 import companyAddressData from '../../../../../tests/support/data/company-address.data.js'
 import companyData from '../../../../../tests/support/data/company.data.js'
@@ -9,6 +8,7 @@ import licenceVersionData from '../../../../../tests/support/data/licence-versio
 import licenceVersionPurposeConditionData from '../../../../../tests/support/data/licence-version-purpose-condition.data.js'
 import licenceVersionPurposeData from '../../../../../tests/support/data/licence-version-purpose.data.js'
 import licenceVersionPurposePointData from '../../../../../tests/support/data/licence-version-purpose-point.data.js'
+import { addPurpose, purposesOn } from './purposes.helpers.js'
 
 /**
  * Give a licence a new licence version because a purpose was added
